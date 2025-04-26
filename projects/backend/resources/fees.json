@@ -1,0 +1,92 @@
+{
+  "fees": [
+    {
+      "valid_from": "2025-01-01",
+      "fees": [
+        {
+          "name": "Netzentgelte",
+          "pricing": "per_kwh",
+          "currency": "EUR",
+          "schedule": {"default": [{"start": "00:00", "price": "0.1186"}]}
+        },
+        {
+          "name": "Kraft-Wärme-Kopplungsgesetz-Umlage",
+          "pricing": "per_kwh",
+          "currency": "EUR",
+          "schedule": {"default": [{"start": "00:00", "price": "0.00277"}]}
+        },
+        {
+          "name": "Aufschlag für besondere Netznutzung",
+          "pricing": "per_kwh",
+          "currency": "EUR",
+          "schedule": {"default": [{"start": "00:00", "price": "0.01558"}]}
+        },
+        {
+          "name": "Offshore-Netzumlage",
+          "pricing": "per_kwh",
+          "currency": "EUR",
+          "schedule": {"default": [{"start": "00:00", "price": "0.00816"}]}
+        },
+        {
+          "name": "Stromsteuer",
+          "pricing": "per_kwh",
+          "currency": "EUR",
+          "schedule": {"default": [{"start": "00:00", "price": "0.0205"}]}
+        },
+        {
+          "name": "Mehrwertsteuer",
+          "pricing": "percent",
+          "currency": "EUR",
+          "schedule": {"default": [{"start": "00:00", "price": "19"}]}
+        }
+      ]
+    },
+    {
+      "valid_from": "2025-07-01",
+      "fees": [
+        {
+          "name": "Netzentgelte",
+          "pricing": "per_kwh",
+          "currency": "EUR",
+          "schedule": {
+            "default": [
+              {"start": "00:00", "price": "0.0415"},
+              {"start": "06:30", "price": "0.1186"},
+              {"start": "22:15", "price": "0.0415"}
+            ]
+          }
+        },
+        {
+          "name": "Kraft-Wärme-Kopplungsgesetz-Umlage",
+          "pricing": "per_kwh",
+          "currency": "EUR",
+          "schedule": {"default": [{"start": "00:00", "price": "0.00277"}]}
+        },
+        {
+          "name": "Aufschlag für besondere Netznutzung",
+          "pricing": "per_kwh",
+          "currency": "EUR",
+          "schedule": {"default": [{"start": "00:00", "price": "0.01558"}]}
+        },
+        {
+          "name": "Offshore-Netzumlage",
+          "pricing": "per_kwh",
+          "currency": "EUR",
+          "schedule": {"default": [{"start": "00:00", "price": "0.00816"}]}
+        },
+        {
+          "name": "Stromsteuer",
+          "pricing": "per_kwh",
+          "currency": "EUR",
+          "schedule": {"default": [{"start": "00:00", "price": "0.0205"}]}
+        },
+        {
+          "name": "Mehrwertsteuer",
+          "pricing": "percent",
+          "currency": "EUR",
+          "schedule": {"default": [{"start": "00:00", "price": "19"}]}
+        }
+      ]
+    }
+  ]
+}

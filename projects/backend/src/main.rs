@@ -1,3 +1,4 @@
+mod electricity_price;
 mod geocode;
 mod sun;
 mod weather;
@@ -21,6 +22,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             hour.time, hour.temp, hour.clouds, sun.altitude, sun.azimuth
         );
     }
+
+    let fees = electricity_price::parse("resources/fees.json")?;
+    println!("{:?}", fees);
 
     Ok(())
 }
