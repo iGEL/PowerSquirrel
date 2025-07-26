@@ -7,7 +7,13 @@
           "name": "Netzentgelte",
           "pricing": "per_kwh",
           "currency": "EUR",
-          "schedule": {"default": [{"start": "00:00", "price": "0.1186"}]}
+          "schedule": {"default": [{"start": "00:00", "price": "0.0997"}]}
+        },
+        {
+          "name": "Konzessionsabgabe",
+          "pricing": "per_kwh",
+          "currency": "EUR",
+          "schedule": {"default": [{"start": "00:00", "price": "0.0239"}]}
         },
         {
           "name": "Kraft-Wärme-Kopplungsgesetz-Umlage",
@@ -42,7 +48,7 @@
       ]
     },
     {
-      "valid_from": "2025-07-01",
+      "valid_from": "2025-04-01",
       "fees": [
         {
           "name": "Netzentgelte",
@@ -50,9 +56,23 @@
           "currency": "EUR",
           "schedule": {
             "default": [
-              {"start": "00:00", "price": "0.0415"},
-              {"start": "06:30", "price": "0.1186"},
-              {"start": "22:15", "price": "0.0415"}
+              {"start": "00:00", "price": "0.0349"},
+              {"start": "06:30", "price": "0.0997"},
+              {"start": "17:15", "price": "0.1863"},
+              {"start": "20:15", "price": "0.0997"},
+              {"start": "22:15", "price": "0.0349"}
+            ]
+          }
+        },
+        {
+          "name": "Konzessionsabgabe",
+          "pricing": "per_kwh",
+          "currency": "EUR",
+          "schedule": {
+            "default": [
+              {"start": "00:00", "price": "0.0061"},
+              {"start": "06:30", "price": "0.0239"},
+              {"start": "22:15", "price": "0.0061"}
             ]
           }
         },
