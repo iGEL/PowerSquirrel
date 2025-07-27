@@ -16,7 +16,9 @@ PowerSquirrel leverages household batteries and photovoltaic (PV) systems to opt
 3. Smart Battery Management
    * Charge household batteries using grid electricity when solar yield is insufficient to meet predicted consumption.
    * Optimize charging times to benefit from dynamic electricity pricing.
-4. Load Shifting for Cost Efficiency  
+4. Grid-supportive feed-in of PV electricity:  
+   If a predicted surplus cannot be consumed or stored, shift the feed in-times to better match the grid's demand (periods with higher prices) provided the battery can be still fully charged with the remaining sunlight of the day.
+5. Load Shifting for Cost Efficiency  
    Schedule and manage energy-intensive appliances to operate during periods of low-cost or high solar output.
    Examples include:
    * Electric Vehicles (EVs): Ensure vehicles are fully charged by a specified time, prioritizing cheaper energy availability.
