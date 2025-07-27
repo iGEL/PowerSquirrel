@@ -19,6 +19,41 @@ struct PriceEntry {
     price: Money,
 }
 
+fn get_net_prices() -> Vec<PriceEntry> {
+    [
+        ("2025-07-26T00:00:00+02:00", "0.10676"),
+        ("2025-07-26T01:00:00+02:00", "0.1007"),
+        ("2025-07-26T02:00:00+02:00", "0.09773"),
+        ("2025-07-26T03:00:00+02:00", "0.09665"),
+        ("2025-07-26T04:00:00+02:00", "0.09645"),
+        ("2025-07-26T05:00:00+02:00", "0.09489"),
+        ("2025-07-26T06:00:00+02:00", "0.09713"),
+        ("2025-07-26T07:00:00+02:00", "0.0961"),
+        ("2025-07-26T08:00:00+02:00", "0.08786"),
+        ("2025-07-26T09:00:00+02:00", "0.08585"),
+        ("2025-07-26T10:00:00+02:00", "0.07959"),
+        ("2025-07-26T11:00:00+02:00", "0.0752"),
+        ("2025-07-26T12:00:00+02:00", "0.06642"),
+        ("2025-07-26T13:00:00+02:00", "0.04987"),
+        ("2025-07-26T14:00:00+02:00", "0.0509"),
+        ("2025-07-26T15:00:00+02:00", "0.06807"),
+        ("2025-07-26T16:00:00+02:00", "0.07481"),
+        ("2025-07-26T17:00:00+02:00", "0.0842"),
+        ("2025-07-26T18:00:00+02:00", "0.0982"),
+        ("2025-07-26T19:00:00+02:00", "0.1066"),
+        ("2025-07-26T20:00:00+02:00", "0.12195"),
+        ("2025-07-26T21:00:00+02:00", "0.12707"),
+        ("2025-07-26T22:00:00+02:00", "0.11672"),
+        ("2025-07-26T23:00:00+02:00", "0.1088"),
+    ]
+    .iter()
+    .map(|(date_str, price)| PriceEntry {
+        start: DateTime::parse_from_rfc3339(&date_str).unwrap(),
+        price: Money::new(BigDecimal::from_str(price).unwrap(), "EUR"),
+    })
+    .collect()
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let zip = "12207";
@@ -37,106 +72,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let fees = electricity_price::parse("resources/fees.json")?;
     let date = Local::now();
     let date_tz = date.with_timezone(date.offset());
-    // let date_tz = DateTime::parse_from_rfc3339("2025-07-26T06:30:00+02:00").unwrap();
 
-    let net_prices: Vec<PriceEntry> = vec![
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T00:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.10676").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T01:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.1007").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T02:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.09773").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T03:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.09665").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T04:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.09645").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T05:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.09489").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T06:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.09713").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T07:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.0961").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T08:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.08786").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T09:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.08585").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T10:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.07959").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T11:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.0752").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T12:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.06642").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T13:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.04987").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T14:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.0509").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T15:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.06807").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T16:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.07481").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T17:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.0842").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T18:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.0982").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T19:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.1066").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T20:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.12195").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T21:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.12707").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T22:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.11672").unwrap(), "EUR"),
-        },
-        PriceEntry {
-            start: DateTime::parse_from_rfc3339("2025-07-26T23:00:00+02:00").unwrap(),
-            price: Money::new(BigDecimal::from_str("0.1088").unwrap(), "EUR"),
-        },
-    ];
+    let net_prices = get_net_prices();
 
     let mut current_time = DateTime::parse_from_rfc3339("2025-07-26T00:00:00+02:00").unwrap();
     let end_time = DateTime::parse_from_rfc3339("2025-07-26T23:45:00+02:00").unwrap();
