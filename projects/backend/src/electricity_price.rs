@@ -1,33 +1,9 @@
+use crate::money::Money;
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, Datelike, FixedOffset, NaiveDate, NaiveTime};
 use serde::{Deserialize, Serialize};
-use std::fmt;
 use std::fs::File;
 use std::io::BufReader;
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
-pub struct Money {
-    amount: BigDecimal,
-    currency: String,
-}
-impl Money {
-    pub fn new(amount: BigDecimal, currency: &str) -> Self {
-        Money {
-            amount,
-            currency: String::from(currency),
-        }
-    }
-    pub fn fmt_rounded(&self) -> String {
-        let rounded = self.amount.round(2);
-        format!("{:.2} {}", rounded, self.currency)
-    }
-}
-impl fmt::Display for Money {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // Customize formatting if you want fixed decimal digits etc.
-        write!(f, "{} {}", self.amount, self.currency)
-    }
-}
 
 #[derive(Debug, Serialize, PartialEq)]
 pub struct PricingBreakdown {
