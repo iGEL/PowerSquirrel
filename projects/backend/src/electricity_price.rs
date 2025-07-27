@@ -17,6 +17,10 @@ impl Money {
             currency: String::from(currency),
         }
     }
+    pub fn fmt_rounded(&self) -> String {
+        let rounded = self.amount.round(2);
+        format!("{:.2} {}", rounded, self.currency)
+    }
 }
 impl fmt::Display for Money {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
