@@ -4,8 +4,10 @@ mod electricity_price;
 mod money;
 use chrono::{DateTime, Duration, FixedOffset, Local};
 use money::Money;
+mod entsoe;
 mod geocode;
 mod sun;
+mod sungrow;
 mod weather;
 
 use geocode::geocode_zip;
@@ -110,6 +112,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
     }
     println!("Gross price: {}", breakdown.total_price);
+
+    entsoe::fetch().await?;
 
     Ok(())
 }
