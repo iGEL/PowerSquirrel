@@ -1,0 +1,40 @@
+[
+  {
+    "valid-from": "2025-04-01",
+    "fees": [
+      {
+        "name": "Netzentgelte",
+        "pricing": "per_kwh",
+        "currency": "EUR",
+        "schedule": {"default": [{"start": "00:00", "price": "0.1"}]},
+        "position": 20
+      },
+      {
+        "name": "Konzessionsabgabe",
+        "pricing": "per_kwh",
+        "currency": "EUR",
+        "schedule": {"default": [{"start": "00:00", "price": "0.0239"}]},
+        "position": 10
+      }
+    ]
+  },
+  {
+    "valid-from": "2025-01-01",
+    "fees": [
+      {
+        "name": "Netzentgelte",
+        "pricing": "per_kwh",
+        "currency": "EUR",
+        "schedule": {"default": [{"start": "00:00", "price": "0.0997"}]},
+        "position": 20
+      },
+      {
+        "name": "Konzessionsabgabe",
+        "pricing": "per_kwh",
+        "currency": "EUR",
+        "schedule": {"default": [{"start": "00:00", "price": "0.0239"}]},
+        "position": 10
+      }
+    ]
+  }
+]

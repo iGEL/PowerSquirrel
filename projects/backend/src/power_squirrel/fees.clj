@@ -5,20 +5,21 @@
    [tick.core :as t]))
 
 (defn- parse-fees [fees]
-  (map (fn [fee]
-         (update fee :schedule
-                 (fn [schedule]
-                   (reduce-kv
-                    (fn [prev key val]
-                      (assoc prev key
-                             (map (fn [start+price]
-                                    (-> start+price
-                                        (update :start t/time)
-                                        (update :price bigdec)))
-                                  val)))
-                    {}
-                    schedule))))
-       fees))
+  (->> fees
+       (map (fn [fee]
+              (update fee :schedule
+                      (fn [schedule]
+                        (reduce-kv
+                         (fn [prev key val]
+                           (assoc prev key
+                                  (map (fn [start+price]
+                                         (-> start+price
+                                             (update :start t/time)
+                                             (update :price bigdec)))
+                                       val)))
+                         {}
+                         schedule)))))
+       (sort-by :position)))
 
 (defn- parse-period [period]
   (-> period
@@ -27,23 +28,24 @@
 
 (defn parse [path]
   (->> (json/parse-string (slurp path) true)
-       (map parse-period)))
+       (map parse-period)
+       (sort-by :valid-from)))
 
 (defn merge
   "Merges 2 fee schedules"
-  [fee1 fee2]
-  (->> (concat (map :valid-from fee1)
-               (map :valid-from fee2))
+  [schedule1 schedule2]
+  (->> (concat (map :valid-from schedule1)
+               (map :valid-from schedule2))
        set
        vec
        sort
        (map (fn [date]
-              (let [fee1-fees (->> fee1
+              (let [fee1-fees (->> schedule1
                                    (remove #(t/> (:valid-from %) date))
                                    (sort-by :valid-from)
                                    last
                                    :fees)
-                    fee2-fees (->> fee2
+                    fee2-fees (->> schedule2
                                    (remove #(t/> (:valid-from %) date))
                                    (sort-by :valid-from)
                                    last
