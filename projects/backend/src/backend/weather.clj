@@ -1,4 +1,4 @@
-(ns power-squirrel.weather
+(ns backend.weather
   (:require [clj-http.client :as http]
             [cheshire.core :as json]))
 

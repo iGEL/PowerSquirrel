@@ -4,7 +4,7 @@
         clj-http/clj-http   {:mvn/version "3.13.1"}
         tick/tick {:mvn/version "1.0"}}
  :aliases
- {:run {:main-opts ["-m" "power-squirrel.core"]}
+ {:run {:main-opts ["-m" "backend.main"]}
   :repl {:main-opts ["-m" "nrepl.cmdline"
                      "-p" "56565"
                      "--interactive"

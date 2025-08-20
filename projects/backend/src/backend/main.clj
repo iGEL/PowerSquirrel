@@ -1,8 +1,8 @@
-(ns power-squirrel.core
-  (:require [power-squirrel.geocode :as geocode]
-            [power-squirrel.weather :as weather]
-            [power-squirrel.electricity-price :as ep]
-            [power-squirrel.fees :as fees])
+(ns backend.main
+  (:require [backend.geocode :as geocode]
+            [backend.weather :as weather]
+            [backend.electricity-price :as ep]
+            [backend.fees :as fees])
   (:import (java.time ZonedDateTime ZoneId LocalDate Duration)
            (java.math BigDecimal RoundingMode)))
 

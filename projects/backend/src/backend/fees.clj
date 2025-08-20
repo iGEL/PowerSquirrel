@@ -1,4 +1,4 @@
-(ns power-squirrel.fees
+(ns backend.fees
   (:refer-clojure :exclude [merge])
   (:require
    [cheshire.core :as json]

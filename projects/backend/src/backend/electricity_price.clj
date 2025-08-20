@@ -1,4 +1,4 @@
-(ns power-squirrel.electricity-price
+(ns backend.electricity-price
   (:require
    [cheshire.core :as json]
    [clojure.java.io :refer [reader]])

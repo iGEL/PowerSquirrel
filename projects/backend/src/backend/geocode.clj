@@ -1,4 +1,4 @@
-(ns power-squirrel.geocode
+(ns backend.geocode
   (:require [clj-http.client :as http]
             [cheshire.core :as json]))
 
