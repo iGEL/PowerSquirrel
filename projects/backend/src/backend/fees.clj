@@ -1,8 +1,8 @@
 (ns backend.fees
   (:refer-clojure :exclude [merge])
   (:require
-   [clojure.string :as str]
    [cheshire.core :as json]
+   [clojure.string :as str]
    [tick.core :as t])
   (:import
    [java.time DayOfWeek]

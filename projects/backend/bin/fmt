@@ -1,0 +1,4 @@
+#!/bin/sh
+
+clojure -M:nsorg-fix src test &&
+  clojure -M:cljfmt-fix src test deps.edn

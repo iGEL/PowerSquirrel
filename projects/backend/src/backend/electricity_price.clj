@@ -3,8 +3,8 @@
    [cheshire.core :as json]
    [clojure.java.io :refer [reader]])
   (:import
-   (java.time ZonedDateTime LocalDate LocalTime DayOfWeek)
-   (java.math BigDecimal)))
+   (java.math BigDecimal)
+   (java.time DayOfWeek LocalDate LocalTime ZonedDateTime)))
 
 (defn parse-fees [path]
   (with-open [r (reader path)]

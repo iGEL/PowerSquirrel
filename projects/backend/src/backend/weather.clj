@@ -1,6 +1,6 @@
 (ns backend.weather
-  (:require [clj-http.client :as http]
-            [cheshire.core :as json]))
+  (:require [cheshire.core :as json]
+            [clj-http.client :as http]))
 
 (defn fetch-weather [{:keys [lat lon]}]
   (when-let [api (System/getenv "OPENWEATHERMAP_APIKEY")]

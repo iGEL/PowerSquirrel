@@ -1,10 +1,10 @@
 (ns backend.main
-  (:require [backend.geocode :as geocode]
-            [backend.weather :as weather]
-            [backend.electricity-price :as ep]
-            [backend.fees :as fees])
-  (:import (java.time ZonedDateTime ZoneId LocalDate Duration)
-           (java.math BigDecimal RoundingMode)))
+  (:require [backend.electricity-price :as ep]
+            [backend.fees :as fees]
+            [backend.geocode :as geocode]
+            [backend.weather :as weather])
+  (:import (java.math BigDecimal RoundingMode)
+           (java.time Duration LocalDate ZonedDateTime ZoneId)))
 
 (defn fmt-money [^BigDecimal amount currency]
   (str (.setScale amount 2 RoundingMode/HALF_UP) " " currency))
@@ -47,13 +47,13 @@
 
   (let [stromnetz-berlin (fees/parse "../backend/resources/stromnetz-berlin.json")
         fees (fees/parse "../backend/resources/fees.json")]
-    (clojure.pprint/pprint (fees/merge  fees stromnetz-berlin)))
+    (clojure.pprint/pprint (fees/merge fees stromnetz-berlin)))
   #_(let [fees (ep/parse-fees "../backend/resources/fees.json")
           now (ZonedDateTime/now (ZoneId/systemDefault))
           net-prices (map (fn [[ts p]] [(ZonedDateTime/parse ts) (BigDecimal. ^String p)]) (get-net-prices))
           start (ZonedDateTime/parse "2025-07-26T00:00:00+02:00")
-          end   (ZonedDateTime/parse "2025-07-26T23:45:00+02:00")
-          step  (Duration/ofMinutes 15)]
+          end (ZonedDateTime/parse "2025-07-26T23:45:00+02:00")
+          step (Duration/ofMinutes 15)]
       (loop [t start]
         (when (.isBefore t (.plusMinutes end 1))
           (let [[_ price] (or (last (filter (fn [[st _]] (not (.isAfter st t))) net-prices)) (first net-prices))

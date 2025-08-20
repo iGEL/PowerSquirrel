@@ -1,6 +1,6 @@
 (ns backend.geocode
-  (:require [clj-http.client :as http]
-            [cheshire.core :as json]))
+  (:require [cheshire.core :as json]
+            [clj-http.client :as http]))
 
 (defn geocode-zip [zip country]
   (let [url (format "https://nominatim.openstreetmap.org/search.php?country=%s&postalcode=%s&format=jsonv2"

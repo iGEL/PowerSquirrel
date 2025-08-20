@@ -1,7 +1,7 @@
 (ns backend.fees-test
   (:require
-   [clojure.test :refer [deftest is testing]]
    [backend.fees :as fees]
+   [clojure.test :refer [deftest is testing]]
    [tick.core :as t]))
 
 (deftest parse-test
