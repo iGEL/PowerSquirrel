@@ -1,8 +1,21 @@
 (ns backend.fees
   (:refer-clojure :exclude [merge])
   (:require
+   [clojure.string :as str]
    [cheshire.core :as json]
-   [tick.core :as t]))
+   [tick.core :as t])
+  (:import
+   [java.time DayOfWeek]
+   [java.time.format DateTimeFormatter]
+   [java.util Locale]))
+
+(defn- parse-day-of-week [str]
+  (let [formatter (DateTimeFormatter/ofPattern "EEE" Locale/ENGLISH)]
+    (->> str
+         str/lower-case
+         str/capitalize
+         (.parse formatter)
+         DayOfWeek/from)))
 
 (defn- parse-fees [fees]
   (->> fees
@@ -11,7 +24,10 @@
                       (fn [schedule]
                         (reduce-kv
                          (fn [prev key val]
-                           (assoc prev key
+                           (assoc prev
+                                  (if (= :default key)
+                                    key
+                                    (parse-day-of-week (name key)))
                                   (map (fn [start+price]
                                          (-> start+price
                                              (update :start t/time)

@@ -6,7 +6,17 @@
         "name": "Netzentgelte",
         "pricing": "per_kwh",
         "currency": "EUR",
-        "schedule": {"default": [{"start": "00:00", "price": "0.1"}]},
+        "schedule": {
+          "default": [
+            {"start": "00:00", "price": "0.0349"},
+            {"start": "06:30", "price": "0.0997"},
+            {"start": "17:15", "price": "0.1863"},
+            {"start": "20:15", "price": "0.0997"},
+            {"start": "22:15", "price": "0.0349"}
+          ],
+          "sat": [{"start": "00:00", "price": "0.0349"}],
+          "sun": [{"start": "00:00", "price": "0.0349"}]
+        },
         "position": 20
       },
       {
