@@ -20,7 +20,8 @@
 
 (defn- parse-fees [fees]
   (->> fees
-       (map (fn [fee]
+       (map (fn [{:keys [pricing]
+                  :as fee}]
               (let [currency (-> fee :currency str/lower-case keyword)]
                 (-> fee
                     (dissoc :currency)
@@ -32,10 +33,16 @@
                                         (if (= :default key)
                                           key
                                           (parse-day-of-week (name key)))
-                                        (map (fn [start+price]
-                                               (-> start+price
-                                                   (update :start t/time)
-                                                   (update :price #(money-of % currency))))
+                                        (map (fn [start+pricing]
+                                               (cond-> start+pricing
+                                                 :always
+                                                 (update :start t/time)
+
+                                                 (= "per_kwh" pricing)
+                                                 (update :price #(money-of % currency))
+
+                                                 (= "percent" pricing)
+                                                 (update :percent bigdec)))
                                              val)))
                                {}
                                schedule)))))))

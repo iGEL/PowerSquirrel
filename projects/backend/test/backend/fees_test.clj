@@ -18,7 +18,12 @@
                      :pricing "per_kwh"
                      :schedule {:default [{:start (t/time "00:00")
                                            :price (money-of 0.0997M :eur)}]}
-                     :position 20}]}
+                     :position 20}
+                    {:name "Mehrwertsteuer"
+                     :pricing "percent"
+                     :schedule {:default [{:start (t/time "00:00")
+                                           :percent 19M}]}
+                     :position 100}]}
             {:valid-from (t/date "2025-04-01")
              :timezone "Europe/Berlin"
              :fees [{:name "Konzessionsabgabe"
@@ -42,7 +47,12 @@
                                                                :price (money-of 0.0349M :eur)}]
                                 #time/day-of-week "SUNDAY" [{:start (t/time "00:00")
                                                              :price (money-of 0.0349M :eur)}]}
-                     :position 20}]}]
+                     :position 20}
+                    {:name "Mehrwertsteuer"
+                     :pricing "percent"
+                     :schedule {:default [{:start (t/time "00:00")
+                                           :percent 19M}]}
+                     :position 100}]}]
            (fees/parse "test/fixtures/fees.json")))))
 
 (deftest merge-test
@@ -62,7 +72,7 @@
                     {:name "Mehrwertsteuer"
                      :pricing "percent"
                      :schedule {:default [{:start (t/time "00:00")
-                                           :price (money-of 19M :eur)}]}
+                                           :percent 19M}]}
                      :position 100}]}
             {:valid-from (t/date "2025-04-01")
              :timezone "Europe/Berlin"
@@ -87,7 +97,7 @@
                     {:name "Mehrwertsteuer"
                      :pricing "percent"
                      :schedule {:default [{:start (t/time "00:00")
-                                           :price (money-of 19M :eur)}]}
+                                           :percent 19M}]}
                      :position 100}]}]
            (fees/merge
             [{:valid-from (t/date "2025-01-01")
@@ -95,7 +105,7 @@
               :fees [{:name "Mehrwertsteuer"
                       :pricing "percent"
                       :schedule {:default [{:start (t/time "00:00")
-                                            :price (money-of 19M :eur)}]}
+                                            :percent 19M}]}
                       :position 100}
                      {:name "Kraft-Wärme-Kopplungsgesetz-Umlage"
                       :pricing "per_kwh"

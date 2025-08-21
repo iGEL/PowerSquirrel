@@ -35,7 +35,7 @@
         "name": "Mehrwertsteuer",
         "pricing": "percent",
         "currency": "EUR",
-        "schedule": {"default": [{"start": "00:00", "price": "19"}]},
+        "schedule": {"default": [{"start": "00:00", "percent": "19"}]},
         "position": 100
       }
     ]

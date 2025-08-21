@@ -26,6 +26,13 @@
         "currency": "EUR",
         "schedule": {"default": [{"start": "00:00", "price": "0.0239"}]},
         "position": 10
+      },
+      {
+        "name": "Mehrwertsteuer",
+        "pricing": "percent",
+        "currency": "EUR",
+        "schedule": {"default": [{"start": "00:00", "percent": "19"}]},
+        "position": 100
       }
     ]
   },
@@ -46,6 +53,13 @@
         "currency": "EUR",
         "schedule": {"default": [{"start": "00:00", "price": "0.0239"}]},
         "position": 10
+      },
+      {
+        "name": "Mehrwertsteuer",
+        "pricing": "percent",
+        "currency": "EUR",
+        "schedule": {"default": [{"start": "00:00", "percent": "19"}]},
+        "position": 100
       }
     ]
   }
