@@ -1,6 +1,7 @@
 [
   {
     "valid-from": "2025-01-01",
+    "timezone": "Europe/Berlin",
     "fees": [
       {
         "name": "Kraft-Wärme-Kopplungsgesetz-Umlage",

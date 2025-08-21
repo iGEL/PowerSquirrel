@@ -71,5 +71,6 @@
                                    last
                                    :fees)]
                 {:valid-from date
+                 :timezone (-> schedule1 first :timezone)
                  :fees (->> (concat fee1-fees fee2-fees)
                             (sort-by :position))})))))

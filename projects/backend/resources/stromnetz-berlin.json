@@ -1,6 +1,7 @@
 [
   {
     "valid-from": "2025-01-01",
+    "timezone": "Europe/Berlin",
     "fees": [
       {
         "name": "Netzentgelte",
@@ -20,6 +21,7 @@
   },
   {
     "valid-from": "2025-04-01",
+    "timezone": "Europe/Berlin",
     "fees": [
       {
         "name": "Netzentgelte",

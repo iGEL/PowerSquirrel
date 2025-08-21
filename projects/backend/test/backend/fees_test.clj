@@ -8,6 +8,7 @@
 (deftest parse-test
   (testing "a schedule"
     (is (= [{:valid-from (t/date "2025-01-01")
+             :timezone "Europe/Berlin"
              :fees [{:name "Konzessionsabgabe"
                      :pricing "per_kwh"
                      :schedule {:default [{:start (t/time "00:00")
@@ -19,6 +20,7 @@
                                            :price (money-of 0.0997M :eur)}]}
                      :position 20}]}
             {:valid-from (t/date "2025-04-01")
+             :timezone "Europe/Berlin"
              :fees [{:name "Konzessionsabgabe"
                      :pricing "per_kwh"
                      :schedule {:default [{:start (t/time "00:00")
@@ -46,6 +48,7 @@
 (deftest merge-test
   (testing "merging two schedules"
     (is (= [{:valid-from (t/date "2025-01-01")
+             :timezone "Europe/Berlin"
              :fees [{:name "Netzentgelte"
                      :pricing "per_kwh"
                      :schedule {:default [{:start (t/time "00:00")
@@ -62,6 +65,7 @@
                                            :price (money-of 19M :eur)}]}
                      :position 100}]}
             {:valid-from (t/date "2025-04-01")
+             :timezone "Europe/Berlin"
              :fees [{:name "Netzentgelte"
                      :pricing "per_kwh"
                      :schedule {:default [{:start (t/time "00:00")
@@ -87,6 +91,7 @@
                      :position 100}]}]
            (fees/merge
             [{:valid-from (t/date "2025-01-01")
+              :timezone "Europe/Berlin"
               :fees [{:name "Mehrwertsteuer"
                       :pricing "percent"
                       :schedule {:default [{:start (t/time "00:00")
@@ -98,12 +103,14 @@
                                             :price (money-of 0.00277M :eur)}]}
                       :position 30}]}]
             [{:valid-from (t/date "2025-01-01")
+              :timezone "Europe/Berlin"
               :fees [{:name "Netzentgelte"
                       :pricing "per_kwh"
                       :schedule {:default [{:start (t/time "00:00")
                                             :price (money-of 0.0997M :eur)}]}
                       :position 20}]}
              {:valid-from (t/date "2025-04-01")
+              :timezone "Europe/Berlin"
               :fees [{:name "Netzentgelte"
                       :pricing "per_kwh"
                       :schedule {:default [{:start (t/time "00:00")
