@@ -64,42 +64,27 @@
                                  (content-of-tag :start)
                                  first
                                  ZonedDateTime/parse)
-                       end (-> (content-of-tag period :timeInterval)
-                               (content-of-tag :end)
-                               first
-                               ZonedDateTime/parse)
-                       parse-points (fn [points]
-                                      (loop [position 1
-                                             result []
-                                             remaining points
-                                             time start]
-                                        (let [price (-> remaining
-                                                        first
-                                                        :content
-                                                        (content-of-tag :price.amount)
-                                                        first
-                                                        (money-of currency)
-                                                        kwh-conversion)
-                                              xml-position (-> remaining
-                                                               first
-                                                               :content
-                                                               (content-of-tag :position)
-                                                               first
-                                                               Integer/parseInt)
-                                              new-result (if (= position xml-position)
-                                                           (conj result [time price])
-                                                           (conj result [time (-> result last last)]))
-                                              new-remaining (if (= position xml-position)
-                                                              (rest remaining)
-                                                              remaining)
-                                              new-time (t/>> time step)]
-                                          (if (= new-time end)
-                                            (into (sorted-map) new-result)
-                                            (recur
-                                             (inc position)
-                                             new-result
-                                             new-remaining
-                                             new-time)))))]
+                       parse-points
+                       (fn [points]
+                         (reduce
+                          (fn [result point]
+                            (let [price (-> point
+                                            :content
+                                            (content-of-tag :price.amount)
+                                            first
+                                            (money-of currency)
+                                            kwh-conversion)
+                                  start-offset (.multipliedBy step
+                                                              (-> point
+                                                                  :content
+                                                                  (content-of-tag :position)
+                                                                  first
+                                                                  Integer/parseInt
+                                                                  dec))]
+                              (conj result {:start (t/>> start start-offset)
+                                            :price price})))
+                          []
+                          points))]
                    (assoc prev
                           (-> resolution str/lower-case keyword)
                           {:pricing pricing
