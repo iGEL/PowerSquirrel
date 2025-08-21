@@ -3,6 +3,7 @@
   (:require
    [cheshire.core :as json]
    [clojure.string :as str]
+   [dinero.core :refer [money-of]]
    [tick.core :as t])
   (:import
    [java.time DayOfWeek]
@@ -20,21 +21,24 @@
 (defn- parse-fees [fees]
   (->> fees
        (map (fn [fee]
-              (update fee :schedule
-                      (fn [schedule]
-                        (reduce-kv
-                         (fn [prev key val]
-                           (assoc prev
-                                  (if (= :default key)
-                                    key
-                                    (parse-day-of-week (name key)))
-                                  (map (fn [start+price]
-                                         (-> start+price
-                                             (update :start t/time)
-                                             (update :price bigdec)))
-                                       val)))
-                         {}
-                         schedule)))))
+              (let [currency (-> fee :currency str/lower-case keyword)]
+                (-> fee
+                    (dissoc :currency)
+                    (update :schedule
+                            (fn [schedule]
+                              (reduce-kv
+                               (fn [prev key val]
+                                 (assoc prev
+                                        (if (= :default key)
+                                          key
+                                          (parse-day-of-week (name key)))
+                                        (map (fn [start+price]
+                                               (-> start+price
+                                                   (update :start t/time)
+                                                   (update :price #(money-of % currency))))
+                                             val)))
+                               {}
+                               schedule)))))))
        (sort-by :position)))
 
 (defn- parse-period [period]
