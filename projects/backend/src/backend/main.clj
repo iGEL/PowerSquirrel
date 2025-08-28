@@ -1,17 +1,38 @@
 (ns backend.main
-  (:require [backend.electricity-price :as ep]
-            [backend.entsoe :as entsoe]
-            [backend.fees :as fees]
-            [backend.geocode :as geocode]
-            [backend.result :refer [ok?]]
-            [backend.weather :as weather]
-            [dinero.format :refer [format-money]]
-            [tick.core :as t]))
+  (:require
+   [backend.couchdb :as couchdb]
+   [backend.electricity-price :as ep]
+   [backend.entsoe :as entsoe]
+   [backend.fees :as fees]
+   [backend.geocode :as geocode]
+   [backend.result :refer [branch-ok ok?]]
+   [backend.weather :as weather]
+   [dinero.format :refer [format-money]]
+   [tick.core :as t]))
+
+(defn find-or-create-location [zip country]
+  (if-let [found (->> (couchdb/fetch-locations<>)
+                      :val
+                      (filter #(= [zip country]
+                                  [(:zip %) (:country %)]))
+                      first)]
+    found
+    (let [{:keys [lat lon]} (geocode/geocode-zip zip country)
+          doc {:name "abc"
+               :zip zip
+               :country country
+               :lat lat
+               :lon lon}]
+      (println "New location!")
+      (-> (couchdb/create-location<> doc)
+          (branch-ok (fn [_]
+                       doc))))))
 
 (defn -main [& _]
+  (couchdb/setup<>)
   (let [zip "12207"
         country "Germany"
-        loc (geocode/geocode-zip zip country)
+        loc (find-or-create-location zip country)
         weathers (when loc (weather/fetch-weather loc))]
     (when (and loc weathers)
       (doseq [{:keys [time temp clouds]} weathers]
