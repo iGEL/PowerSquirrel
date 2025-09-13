@@ -11,6 +11,16 @@ services:
       - COUCHDB_PASSWORD=password
     volumes:
       - couchdb_data:/opt/couchdb/data
+  couchdb_test:
+    container_name: posq-couchdb-test
+    image: apache/couchdb:3.5.0
+    ports:
+      - "15984:5984"
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=password
+    volumes:
+      - couchdb_data_test:/opt/couchdb/data
 
 volumes:
   couchdb_data:

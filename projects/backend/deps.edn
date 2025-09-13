@@ -7,7 +7,9 @@
         com.sernamar/dinero {:mvn/version "0.3.0"
                              :exclusions [hato/hato
                                           com.github.seancorfield/next.jdbc
-                                          com.h2database/h2]}}
+                                          com.h2database/h2]}
+        integrant/integrant {:mvn/version "1.0.0"}
+        aero/aero {:mvn/version "1.1.6"}}
  :aliases
  {:run {:main-opts ["-e"
                     "(do (try (require 'dev) (catch Throwable _ nil)) (require 'backend.main) (apply (resolve 'backend.main/-main) *command-line-args*))"]}

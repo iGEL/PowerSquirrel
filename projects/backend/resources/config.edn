@@ -1,0 +1,3 @@
+{:couchdb {:base-uri #profile {:default "http://localhost:5984"
+                               :test "http://localhost:15984"}
+           :basic-auth ["admin" "password"]}}

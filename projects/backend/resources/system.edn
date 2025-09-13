@@ -1,0 +1,3 @@
+{:backend.config/config {}
+ :backend.couchdb/couchdb {:backend.config/config #ig/ref :backend.config/config}
+ :backend.location/location {:backend.couchdb/couchdb #ig/ref :backend.couchdb/couchdb}}
