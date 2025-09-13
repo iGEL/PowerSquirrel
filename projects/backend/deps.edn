@@ -9,7 +9,9 @@
                                           com.github.seancorfield/next.jdbc
                                           com.h2database/h2]}}
  :aliases
- {:run {:main-opts ["-m" "backend.main"]}
+ {:run {:main-opts ["-e"
+                    "(do (try (require 'dev) (catch Throwable _ nil)) (require 'backend.main) (apply (resolve 'backend.main/-main) *command-line-args*))"]}
+  :dev {:extra-paths ["dev"]}
   :repl {:main-opts ["-m" "nrepl.cmdline"
                      "-p" "56565"
                      "--interactive"
