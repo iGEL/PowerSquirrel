@@ -10,6 +10,8 @@
    [dinero.format :refer [format-money]]
    [tick.core :as t]))
 
+(def version "0.0.1")
+
 (defn find-or-create-location [zip country]
   (if-let [found (->> (couchdb/fetch-locations<>)
                       :val
@@ -29,6 +31,7 @@
                        doc))))))
 
 (defn -main [& _]
+  (println (str "PowerSquirrel " version " 🐿️"))
   (couchdb/setup<>)
   (let [zip "12207"
         country "Germany"
