@@ -5,7 +5,7 @@
    [backend.entsoe :as entsoe]
    [backend.fees :as fees]
    [backend.geocode :as geocode]
-   [backend.result :refer [branch-ok ok?]]
+   [backend.result :refer [branch-err branch-ok ok?]]
    [backend.weather :as weather]
    [dinero.format :refer [format-money]]
    [tick.core :as t]))
@@ -32,7 +32,14 @@
 
 (defn -main [& _]
   (println (str "PowerSquirrel " version " 🐿️"))
-  (couchdb/setup<>)
+  (-> (couchdb/setup<>)
+      (branch-err (fn [e]
+                    (binding [*out* *err*]
+                      (println (str "\u001b[31m"
+                                    "Failure to setup couchdb. "
+                                    (ex-message e)
+                                    "\u001b[0m")))
+                    (System/exit 1))))
   (let [zip "12207"
         country "Germany"
         loc (find-or-create-location zip country)
