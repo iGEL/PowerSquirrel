@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   couchdb:
     container_name: posq-couchdb
@@ -19,8 +17,6 @@ services:
     environment:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=password
-    volumes:
-      - couchdb_data_test:/opt/couchdb/data
 
 volumes:
   couchdb_data:
