@@ -1,3 +1,9 @@
 {:couchdb {:base-uri #profile {:default "http://localhost:5984"
                                :test "http://localhost:15984"}
-           :basic-auth ["admin" "password"]}}
+           :basic-auth ["admin" "password"]}
+ :entsoe {:base-uri "https://web-api.tp.entsoe.eu/api"
+          :bidding-zones {:de-lu {:bidding-zone-id "10Y1001A1001A82H"
+                                  :timezone "Europe/Berlin"}}
+          :document-type "A44"
+          :token #profile {:default #env "ENTSOE_TOKEN"
+                           :test "sec123"}}}

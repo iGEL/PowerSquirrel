@@ -16,6 +16,7 @@
 (defn -main [& _]
   (println (str "PowerSquirrel " version " 🐿️"))
   (let [{:keys [backend.couchdb/couchdb
+                backend.entsoe/entsoe
                 backend.location/location]} (system/init)]
     (-> (couchdb/setup<> couchdb)
         (branch-err (fn [e]
@@ -38,7 +39,7 @@
 
     (let [stromnetz-berlin (fees/parse "../backend/resources/stromnetz-berlin.json")
           fees (fees/merge stromnetz-berlin (fees/parse "../backend/resources/fees.json"))
-          prices<> (entsoe/fetch-prices<> (t/today) :de-lu)
+          prices<> (entsoe/fetch-prices<> entsoe (t/today) :de-lu)
           step (t/new-duration 15 :minutes)
           datetime-format (t/formatter "yyyy-MM-dd HH:mm")]
       (when (ok? prices<>)

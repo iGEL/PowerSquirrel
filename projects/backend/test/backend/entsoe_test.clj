@@ -2,19 +2,27 @@
   (:require
    [backend.entsoe :as entsoe]
    [backend.result :refer [->Ok err? ok?]]
+   [backend.system :as system]
    [clj-http.fake :refer [with-fake-routes-in-isolation]]
-   [clojure.test :refer [deftest is]]
+   [clojure.test :refer [deftest is use-fixtures]]
    [dinero.core :refer [money-of]]
    [tick.core :as t]))
 
+(def ^:dynamic *system* nil)
+
+(use-fixtures :once (fn [test-fn]
+                      (binding [*system* (system/init)]
+                        (test-fn)
+                        (system/halt *system*))))
+
 (deftest default
-  (let [result (with-redefs [entsoe/token "sec123"]
-                 (with-fake-routes-in-isolation
-                   {"https://web-api.tp.entsoe.eu/api?securityToken=sec123&documentType=A44&in_Domain=10Y1001A1001A82H&out_Domain=10Y1001A1001A82H&periodStart=202508202200&periodEnd=202508212200"
-                    (constantly {:status 200
-                                 :body (slurp "test/fixtures/Energy_Prices_202508202200-202508212200.xml")})}
-                   (entsoe/fetch-prices<> (t/date "2025-08-21")
-                                          :de-lu)))]
+  (let [result (with-fake-routes-in-isolation
+                 {"https://web-api.tp.entsoe.eu/api?securityToken=sec123&documentType=A44&in_Domain=10Y1001A1001A82H&out_Domain=10Y1001A1001A82H&periodStart=202508202200&periodEnd=202508212200"
+                  (constantly {:status 200
+                               :body (slurp "test/fixtures/Energy_Prices_202508202200-202508212200.xml")})}
+                 (entsoe/fetch-prices<> (:backend.entsoe/entsoe *system*)
+                                        (t/date "2025-08-21")
+                                        :de-lu))]
     (is (ok? result))
     (is (= 95 (-> result :val :pt15m :schedule count))) ;; 18:15 has same price as 18:00
     (is (= 23 (-> result :val :pt60m :schedule count))) ;; 19:00 has same price as 18:00
@@ -263,13 +271,13 @@
            result))))
 
 (deftest dst-begin
-  (let [result (with-redefs [entsoe/token "sec123"]
-                 (with-fake-routes-in-isolation
-                   {"https://web-api.tp.entsoe.eu/api?securityToken=sec123&documentType=A44&in_Domain=10Y1001A1001A82H&out_Domain=10Y1001A1001A82H&periodStart=202503292300&periodEnd=202503302200"
-                    (constantly {:status 200
-                                 :body (slurp "test/fixtures/Energy_Prices_begin_dst.xml")})}
-                   (entsoe/fetch-prices<> (t/date "2025-03-30")
-                                          :de-lu)))]
+  (let [result (with-fake-routes-in-isolation
+                 {"https://web-api.tp.entsoe.eu/api?securityToken=sec123&documentType=A44&in_Domain=10Y1001A1001A82H&out_Domain=10Y1001A1001A82H&periodStart=202503292300&periodEnd=202503302200"
+                  (constantly {:status 200
+                               :body (slurp "test/fixtures/Energy_Prices_begin_dst.xml")})}
+                 (entsoe/fetch-prices<> (:backend.entsoe/entsoe *system*)
+                                        (t/date "2025-03-30")
+                                        :de-lu))]
     (is (ok? result))
     (is (= 91 (-> result :val :pt15m :schedule count))) ;; 12:15 has the same price as 12:00
     (is (= 23 (-> result :val :pt60m :schedule count)))
@@ -324,13 +332,13 @@
            (-> result :val :pt60m)))))
 
 (deftest dst-end
-  (let [result (with-redefs [entsoe/token "sec123"]
-                 (with-fake-routes-in-isolation
-                   {"https://web-api.tp.entsoe.eu/api?securityToken=sec123&documentType=A44&in_Domain=10Y1001A1001A82H&out_Domain=10Y1001A1001A82H&periodStart=202410262200&periodEnd=202410272300"
-                    (constantly {:status 200
-                                 :body (slurp "test/fixtures/Energy_Prices_end_dst.xml")})}
-                   (entsoe/fetch-prices<> (t/date "2024-10-27")
-                                          :de-lu)))]
+  (let [result (with-fake-routes-in-isolation
+                 {"https://web-api.tp.entsoe.eu/api?securityToken=sec123&documentType=A44&in_Domain=10Y1001A1001A82H&out_Domain=10Y1001A1001A82H&periodStart=202410262200&periodEnd=202410272300"
+                  (constantly {:status 200
+                               :body (slurp "test/fixtures/Energy_Prices_end_dst.xml")})}
+                 (entsoe/fetch-prices<> (:backend.entsoe/entsoe *system*)
+                                        (t/date "2024-10-27")
+                                        :de-lu))]
     (is (ok? result))
     (is (= 97 (-> result :val :pt15m :schedule count))) ;; 1:45 has the same price as 1:30, 2:45 as 2:30, 10:30 as 10:15
     (is (= 25 (-> result :val :pt60m :schedule count)))
@@ -389,11 +397,11 @@
            (-> result :val :pt60m)))))
 
 (deftest failure
-  (let [result (with-redefs [entsoe/token "sec123"]
-                 (with-fake-routes-in-isolation
-                   {"https://web-api.tp.entsoe.eu/api?securityToken=sec123&documentType=A44&in_Domain=10Y1001A1001A82H&out_Domain=10Y1001A1001A82H&periodStart=202508202200&periodEnd=202508212200"
-                    (constantly {:status 404
-                                 :body "Not found"})}
-                   (entsoe/fetch-prices<> (t/date "2025-08-21")
-                                          :de-lu)))]
+  (let [result (with-fake-routes-in-isolation
+                 {"https://web-api.tp.entsoe.eu/api?securityToken=sec123&documentType=A44&in_Domain=10Y1001A1001A82H&out_Domain=10Y1001A1001A82H&periodStart=202508202200&periodEnd=202508212200"
+                  (constantly {:status 404
+                               :body "Not found"})}
+                 (entsoe/fetch-prices<> (:backend.entsoe/entsoe *system*)
+                                        (t/date "2025-08-21")
+                                        :de-lu))]
     (is (err? result))))

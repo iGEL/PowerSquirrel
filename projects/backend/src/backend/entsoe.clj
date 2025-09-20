@@ -6,23 +6,20 @@
    [clojure.string :as str]
    [dinero.core :refer [money-of]]
    [dinero.math :as d.math]
+   [integrant.core :as ig]
    [tick.core :as t])
   (:import [java.time Duration ZonedDateTime]))
 
-(def token (System/getenv "ENTSOE_TOKEN"))
-(def base-uri "https://web-api.tp.entsoe.eu/api")
-(def bidding-zones
-  {:de-lu "10Y1001A1001A82H"})
-(def document-type "A44") ;; Pricing info
 (def uri-datetime-format (t/formatter "yyyyMMddHHmm"))
 (def utc (t/zone "UTC"))
-(def europe-berlin (t/zone "Europe/Berlin"))
 
-(defn- utc-midnight [time]
+(defn- midnight-utc
+  "Returns midnight in the given timezone, converted afterwards to UTC"
+  [{:keys [time in-timezone]}]
   (t/format uri-datetime-format
             (-> time
                 (t/at (t/midnight))
-                (t/in europe-berlin)
+                (t/in (t/zone in-timezone))
                 (t/in utc))))
 
 (defn- strip-xml-ns [xml]
@@ -94,25 +91,39 @@
                {})
        ->Ok))
 
-(defn fetch-prices<> [start zone]
-  (let [uri (str base-uri
-                 "?securityToken=" token
-                 "&documentType=" document-type
-                 "&in_Domain=" (bidding-zones zone)
-                 "&out_Domain=" (bidding-zones zone)
-                 "&periodStart=" (utc-midnight start)
-                 "&periodEnd=" (utc-midnight (t/>> start (t/new-period 1 :days))))]
-    (-> (try-result (http/get uri {:unexceptional-status #(= % 200)}))
-        (branch-ok (fn [{:keys [body]}]
-                     (->Ok body)))
-        (branch-ok (fn [str]
-                     (try-result
-                      (-> str
-                          xml/parse-str))))
-        (branch-ok (fn [xml]
-                     (->Ok (strip-xml-ns xml))))
-        (branch-ok extract-info<>))))
+(defprotocol EntsoeProtocol
+  (fetch-prices<> [this date zone]))
+
+(defrecord Entsoe [base-uri bidding-zones document-type token]
+  EntsoeProtocol
+  (fetch-prices<> [_ date zone]
+    (let [{:keys [timezone bidding-zone-id]} (bidding-zones zone)
+          uri (str base-uri
+                   "?securityToken=" token
+                   "&documentType=" document-type
+                   "&in_Domain=" bidding-zone-id
+                   "&out_Domain=" bidding-zone-id
+                   "&periodStart=" (midnight-utc {:time date
+                                                  :in-timezone timezone})
+                   "&periodEnd=" (midnight-utc {:time (t/>> date (t/new-period 1 :days))
+                                                :in-timezone timezone}))]
+      (-> (try-result (http/get uri {:unexceptional-status #(= % 200)}))
+          (branch-ok (fn [{:keys [body]}]
+                       (->Ok body)))
+          (branch-ok (fn [str]
+                       (try-result
+                        (-> str
+                            xml/parse-str))))
+          (branch-ok (fn [xml]
+                       (->Ok (strip-xml-ns xml))))
+          (branch-ok extract-info<>)))))
+
+(defmethod ig/init-key ::entsoe
+  [_ {{{:keys [base-uri bidding-zones document-type token]} :entsoe} :backend.config/config}]
+  (map->Entsoe {:base-uri base-uri
+                :bidding-zones bidding-zones
+                :document-type document-type
+                :token token}))
 
 (comment
-  (def token "abc")
   (fetch-prices<> (t/date "2025-08-21") :de-lu))
