@@ -54,6 +54,9 @@
                                                           "mwh" {:pricing "per_kwh" :kwh-conversion #(d.math/divide % 1000)}
                                                           "kwh" {:pricing "per_kwh" :kwh-conversion identity})
                        period (content-of-tag content :Period)
+                       position (-> (content-of-tag content :classificationSequence_AttributeInstanceComponent.position)
+                                    first
+                                    Integer/parseInt)
                        resolution (-> (content-of-tag period :resolution)
                                       first)
                        step (Duration/parse resolution)
@@ -82,13 +85,14 @@
                                             :price price})))
                           []
                           points))]
-                   (assoc prev
-                          (-> resolution str/lower-case keyword)
-                          {:pricing pricing
-                           :schedule (->> period
-                                          (filter #(= :Point (:tag %)))
-                                          parse-points)})))
-               {})
+                   (conj prev
+                         {:pricing pricing
+                          :resolution (-> resolution str/lower-case keyword)
+                          :position position
+                          :schedule (->> period
+                                         (filter #(= :Point (:tag %)))
+                                         parse-points)})))
+               [])
        ->Ok))
 
 (defprotocol EntsoeProtocol

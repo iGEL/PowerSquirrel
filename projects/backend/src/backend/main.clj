@@ -48,7 +48,7 @@
                                                           (t/in (t/zone "Europe/Berlin"))))
                               (take 96))]
           (let [{:keys [net total]} (ep/calculate datetime
-                                                  (-> prices<> :val :pt60m :schedule)
+                                                  (->> prices<> :val (filter #(= (:position %) 1)) first :schedule)
                                                   fees)]
             (println (t/format datetime-format datetime)
                      "- net:"
@@ -57,7 +57,7 @@
                      (format-money total))))
         (println "Current price:")
         (let [{:keys [net fees total]} (ep/calculate (t/zoned-date-time)
-                                                     (-> prices<> :val :pt60m :schedule)
+                                                     (->> prices<> :val (filter #(= (:position %) 1)) first :schedule)
                                                      fees)]
           (println "  Net price:" (format-money net))
           (doseq [{:keys [name price]} fees]

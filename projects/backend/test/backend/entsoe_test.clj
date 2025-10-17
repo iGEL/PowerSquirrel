@@ -24,10 +24,13 @@
                                         (t/date "2025-08-21")
                                         :de-lu))]
     (is (ok? result))
-    (is (= 95 (-> result :val :pt15m :schedule count))) ;; 18:15 has same price as 18:00
-    (is (= 23 (-> result :val :pt60m :schedule count))) ;; 19:00 has same price as 18:00
-    (is (= (->Ok {:pt15m
-                  {:pricing "per_kwh"
+    (is (= 95 ;; 18:15 has same price as 18:00
+           (->> result :val (filter #(= (:position %) 2)) first :schedule count)))
+    (is (= 23 ;; 19:00 has same price as 18:00
+           (->> result :val (filter #(= (:position %) 1)) first :schedule count)))
+    (is (= (->Ok [{:pricing "per_kwh"
+                   :resolution :pt15m
+                   :position 2
                    :schedule
                    [{:start #time/zoned-date-time "2025-08-20T22:00Z"
                      :price (money-of 0.1099M :eur)}
@@ -219,8 +222,9 @@
                      :price (money-of 0.0844M :eur)}
                     {:start #time/zoned-date-time "2025-08-21T21:45Z"
                      :price (money-of 0.0744M :eur)}]}
-                  :pt60m
                   {:pricing "per_kwh"
+                   :resolution :pt60m
+                   :position 1
                    :schedule
                    [{:start #time/zoned-date-time "2025-08-20T22:00Z"
                      :price (money-of 0.09611M :eur)}
@@ -267,7 +271,7 @@
                     {:start #time/zoned-date-time "2025-08-21T20:00Z"
                      :price (money-of 0.105M :eur)}
                     {:start #time/zoned-date-time "2025-08-21T21:00Z"
-                     :price (money-of 0.09578M :eur)}]}})
+                     :price (money-of 0.09578M :eur)}]}])
            result))))
 
 (deftest dst-begin
@@ -279,9 +283,13 @@
                                         (t/date "2025-03-30")
                                         :de-lu))]
     (is (ok? result))
-    (is (= 91 (-> result :val :pt15m :schedule count))) ;; 12:15 has the same price as 12:00
-    (is (= 23 (-> result :val :pt60m :schedule count)))
+    (is (= 91 ;; 12:15 has the same price as 12:00
+           (->> result :val (filter #(= (:position %) 2)) first :schedule count)))
+    (is (= 23
+           (->> result :val (filter #(= (:position %) 1)) first :schedule count)))
     (is (= {:pricing "per_kwh"
+            :resolution :pt60m
+            :position 1
             :schedule
             [{:start #time/zoned-date-time "2025-03-29T23:00Z"
               :price (money-of 0.04631M :eur)}
@@ -329,7 +337,7 @@
               :price (money-of 0.06171M :eur)}
              {:start #time/zoned-date-time "2025-03-30T21:00Z"
               :price (money-of 0.05644M :eur)}]}
-           (-> result :val :pt60m)))))
+           (->> result :val (filter #(= (:position %) 1)) first)))))
 
 (deftest dst-end
   (let [result (with-fake-routes-in-isolation
@@ -340,9 +348,13 @@
                                         (t/date "2024-10-27")
                                         :de-lu))]
     (is (ok? result))
-    (is (= 97 (-> result :val :pt15m :schedule count))) ;; 1:45 has the same price as 1:30, 2:45 as 2:30, 10:30 as 10:15
-    (is (= 25 (-> result :val :pt60m :schedule count)))
+    (is (= 97 ;; 1:45 has the same price as 1:30, 2:45 as 2:30, 10:30 as 10:15
+           (->> result :val (filter #(= (:position %) 2)) first :schedule count)))
+    (is (= 25
+           (->> result :val (filter #(= (:position %) 1)) first :schedule count)))
     (is (= {:pricing "per_kwh"
+            :position 1
+            :resolution :pt60m
             :schedule
             [{:start #time/zoned-date-time "2024-10-26T22:00Z"
               :price (money-of 0.09222M :eur)}
@@ -394,7 +406,7 @@
               :price (money-of 0.11368M :eur)}
              {:start #time/zoned-date-time "2024-10-27T22:00Z"
               :price (money-of 0.10299M :eur)}]}
-           (-> result :val :pt60m)))))
+           (->> result :val (filter #(= (:position %) 1)) first)))))
 
 (deftest failure
   (let [result (with-fake-routes-in-isolation
