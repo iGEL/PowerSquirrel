@@ -42,13 +42,7 @@
         "name": "Konzessionsabgabe",
         "pricing": "per_kwh",
         "currency": "EUR",
-        "schedule": {
-          "default": [
-            {"start": "00:00", "price": "0.0061"},
-            {"start": "06:30", "price": "0.0239"},
-            {"start": "22:15", "price": "0.0061"}
-          ]
-        },
+        "schedule": {"default": [{"start": "00:00", "price": "0.0239"}]},
         "position": 20
       }
     ]
