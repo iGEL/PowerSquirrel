@@ -8,10 +8,25 @@
    [backend.result :refer [branch-err ok?]]
    [backend.system :as system]
    [backend.weather :as weather]
-   [dinero.format :refer [format-money]]
+   [dinero.core :as dinero]
    [tick.core :as t]))
 
 (def version "0.0.1")
+
+(defn- format-ct-kWh
+  ([amount]
+   (format-ct-kWh amount {}))
+  ([amount {:keys [padding]}]
+   (let [padding* (-> padding (or 0) (max 0))]
+     (-> amount
+         dinero/get-amount
+         (* 100M)
+         (->> (format (str "%" (+ 4 padding*) ".1f")))
+         (str "ct/kWh")))))
+
+(defn- print-item [item amount {:keys [padding]}]
+  (let [padding* (- padding (count item))]
+    (println (str item (format-ct-kWh amount {:padding padding*})))))
 
 (defn -main [& _]
   (println (str "PowerSquirrel " version " 🐿️"))
@@ -52,14 +67,19 @@
                                                   fees)]
             (println (t/format datetime-format datetime)
                      "- net:"
-                     (format-money net)
+                     (format-ct-kWh net)
                      "- gross:"
-                     (format-money total))))
+                     (format-ct-kWh total))))
         (println "Current price:")
-        (let [{:keys [net fees total]} (ep/calculate (t/zoned-date-time)
-                                                     (->> prices<> :val (filter #(= (:position %) 1)) first :schedule)
-                                                     fees)]
-          (println "  Net price:" (format-money net))
-          (doseq [{:keys [name price]} fees]
-            (println (str "  " name ": " (format-money price))))
-          (println "  Gross price:" (format-money total)))))))
+        (let [{:keys [net total]
+               items :fees} (ep/calculate (t/zoned-date-time)
+                                          (->> prices<> :val (filter #(= (:position %) 1)) first :schedule)
+                                          fees)
+              padding (->> items
+                           (map #(-> % :name count))
+                           (apply max)
+                           (+ 4))]
+          (print-item "  Net price:" net {:padding padding})
+          (doseq [{:keys [name price]} items]
+            (print-item (str "  " name ": ") price {:padding padding}))
+          (print-item "  Gross price:" total {:padding padding}))))))
