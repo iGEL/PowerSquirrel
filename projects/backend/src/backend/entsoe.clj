@@ -1,6 +1,6 @@
 (ns backend.entsoe
   (:require
-   [backend.result :refer [->Ok branch-ok try-result]]
+   [backend.result :refer [->Err ->Ok branch-ok try-result]]
    [clj-http.client :as http]
    [clojure.data.xml :as xml]
    [clojure.string :as str]
@@ -96,7 +96,8 @@
        ->Ok))
 
 (defprotocol EntsoeProtocol
-  (fetch-prices<> [this date zone]))
+  (fetch-prices<> [this date zone])
+  (get-position<> [this position prices<>]))
 
 (defrecord Entsoe [base-uri bidding-zones document-type token]
   EntsoeProtocol
@@ -120,7 +121,17 @@
                             xml/parse-str))))
           (branch-ok (fn [xml]
                        (->Ok (strip-xml-ns xml))))
-          (branch-ok extract-info<>)))))
+          (branch-ok extract-info<>))))
+  (get-position<> [_ position prices<>]
+    (-> prices<>
+        (branch-ok (fn [price-series]
+                     (if-let [prices (->> price-series
+                                          (filter #(= (:position %) position))
+                                          first)]
+                       (->Ok prices)
+                       (->Err (ex-info (str "Requested position " position " is not included in the price series")
+                                       {:requested-position position
+                                        :present-positions (map :position price-series)}))))))))
 
 (defmethod ig/init-key ::entsoe
   [_ {{{:keys [base-uri bidding-zones document-type token]} :entsoe} :backend.config/config}]
@@ -128,6 +139,3 @@
                 :bidding-zones bidding-zones
                 :document-type document-type
                 :token token}))
-
-(comment
-  (fetch-prices<> (t/date "2025-08-21") :de-lu))
