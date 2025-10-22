@@ -58,20 +58,16 @@
 
     (let [stromnetz-berlin (fees/parse "../backend/resources/stromnetz-berlin.json")
           fees (fees/merge stromnetz-berlin (fees/parse "../backend/resources/fees.json"))
-          step (t/new-duration 15 :minutes)
-          datetime-format (t/formatter "yyyy-MM-dd HH:mm")]
+          step (t/new-duration 15 :minutes)]
       (-> (entsoe.couchdb/load-or-fetch-prices<> entsoe-couchdb (t/today) :de-lu)
           (->> (entsoe/get-position<> entsoe 1))
           (branch-ok (fn [prices]
-                       (doseq [datetime (->> (iterate #(t/>> % step) (-> (t/today)
-                                                                         (t/at "00:00")
-                                                                         (t/in (t/zone "Europe/Berlin"))
-                                                                         (t/in (t/zone "UTC"))))
+                       (doseq [datetime (->> (iterate #(t/>> % step) (-> prices :schedule first :start))
                                              (take 96))]
                          (let [{:keys [net total]} (ep/calculate datetime
                                                                  (:schedule prices)
                                                                  fees)]
-                           (println (t/format datetime-format datetime)
+                           (println (str datetime)
                                     "- net:"
                                     (format-ct-kWh net)
                                     "- gross:"
