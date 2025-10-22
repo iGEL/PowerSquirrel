@@ -1,6 +1,6 @@
 ## PowerSquirrel
 
-![](./projects/docs/logo.svg)
+![](./projects/docs/sparky.svg)
 
 PowerSquirrel (posq) is an intelligent power management system designed for private households and small offices. Its primary goal is to optimize electricity usage and storage, ensuring maximum comfort while minimizing costs and reliance on carbon-intensive energy sources.
 
