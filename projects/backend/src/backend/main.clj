@@ -7,6 +7,7 @@
    [backend.fees :as fees]
    [backend.location :as location]
    [backend.result :refer [branch-err branch-ok]]
+   [backend.sun :as sun]
    [backend.system :as system]
    [backend.weather :as weather]
    [dinero.core :as dinero]
@@ -47,14 +48,16 @@
         (branch-err (partial report-err+exit! "Failure to setup couchdb.")))
     (let [zip "12207"
           country "Germany"
-          loc (location/find-or-create-location location
-                                                {:zip zip
-                                                 :country country})
-          weathers (when loc (weather/fetch-weather loc))]
-      (when (and loc weathers)
+          location (location/find-or-create-location location
+                                                     {:zip zip
+                                                      :country country})
+          weathers (when location (weather/fetch-weather location))]
+      (when (and location weathers)
         (doseq [{:keys [time temp clouds]} weathers]
-          ;; Placeholder for sun position; can be implemented with astronomical formulas later.
-          (println (format "%s Temperature: %.2f°, Clouds: %d%%" time temp (int clouds))))))
+          (let [{:keys [azimuth altitude]} (sun/position {:datetime time
+                                                          :location location})]
+            (println (format "%s Temperature: %5.2f°, Clouds: %3d%% - Solar Altitude: %6.2f° Azimuth: %6.2f°"
+                             time temp (int clouds) altitude azimuth))))))
 
     (let [stromnetz-berlin (fees/parse "../backend/resources/stromnetz-berlin.json")
           fees (fees/merge stromnetz-berlin (fees/parse "../backend/resources/fees.json"))
