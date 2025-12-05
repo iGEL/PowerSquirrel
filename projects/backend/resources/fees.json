@@ -39,5 +39,46 @@
         "position": 100
       }
     ]
+  },
+  {
+    "valid-from": "2026-01-01",
+    "timezone": "Europe/Berlin",
+    "fees": [
+      {
+        "name": "Kraft-Wärme-Kopplungsgesetz-Umlage",
+        "pricing": "per_kwh",
+        "currency": "EUR",
+        "schedule": {"default": [{"start": "00:00", "price": "0.00446"}]},
+        "position": 30
+      },
+      {
+        "name": "Aufschlag für besondere Netznutzung",
+        "pricing": "per_kwh",
+        "currency": "EUR",
+        "schedule": {"default": [{"start": "00:00", "price": "0.01559"}]},
+        "position": 30
+      },
+      {
+        "name": "Offshore-Netzumlage",
+        "pricing": "per_kwh",
+        "currency": "EUR",
+        "schedule": {"default": [{"start": "00:00", "price": "0.00941"}]},
+        "position": 30
+      },
+      {
+        "name": "Stromsteuer",
+        "pricing": "per_kwh",
+        "currency": "EUR",
+        "schedule": {"default": [{"start": "00:00", "price": "0.0205"}]},
+        "position": 30
+      },
+      {
+        "name": "Mehrwertsteuer",
+        "pricing": "percent",
+        "currency": "EUR",
+        "schedule": {"default": [{"start": "00:00", "percent": "19"}]},
+        "position": 100
+      }
+    ]
   }
 ]

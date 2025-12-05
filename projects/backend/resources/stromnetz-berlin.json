@@ -46,5 +46,33 @@
         "position": 20
       }
     ]
+  },
+  {
+    "valid-from": "2026-01-01",
+    "timezone": "Europe/Berlin",
+    "fees": [
+      {
+        "name": "Netzentgelte",
+        "pricing": "per_kwh",
+        "currency": "EUR",
+        "schedule": {
+          "default": [
+            {"start": "00:00", "price": "0.0261"},
+            {"start": "06:30", "price": "0.0746"},
+            {"start": "17:15", "price": "0.1394"},
+            {"start": "20:15", "price": "0.0746"},
+            {"start": "22:15", "price": "0.0261"}
+          ]
+        },
+        "position": 20
+      },
+      {
+        "name": "Konzessionsabgabe",
+        "pricing": "per_kwh",
+        "currency": "EUR",
+        "schedule": {"default": [{"start": "00:00", "price": "0.0239"}]},
+        "position": 20
+      }
+    ]
   }
 ]
