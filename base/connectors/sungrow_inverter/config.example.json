@@ -1,0 +1,14 @@
+{
+  "inverter": {
+    "host": "192.168.1.7",
+    "port": 502,
+    "unit": 1
+  },
+  "mqtt": {
+    "host": "localhost",
+    "port": 1883,
+    "user": "posq",
+    "password": "something",
+    "interval_s": 10
+  }
+}
