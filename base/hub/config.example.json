@@ -1,0 +1,11 @@
+{
+  "couchdb": {
+    "base_uri": "http://admin:password@localhost:5984"
+  },
+  "mqtt": {
+    "host": "localhost",
+    "port": 1883,
+    "user": "posq",
+    "password": "password"
+  }
+}
