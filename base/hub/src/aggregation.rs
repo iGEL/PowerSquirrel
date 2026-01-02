@@ -73,8 +73,8 @@ struct InverterDataJson {
     rev: Option<String>,
     #[serde(flatten)]
     base: InverterData,
-    complete: bool,
     battery_pct: f64,
+    complete: bool,
 }
 
 // Returns the watt seconds for the given duration and previous and current watt values
@@ -177,53 +177,290 @@ mod tests {
     use super::*;
     use chrono::{TimeZone, Utc};
 
-    fn event(time: DateTime<Utc>) -> InverterEvent {
-        InverterEvent {
-            ts: time,
-            grid_import_today_wh: 12,
-            grid_export_today_wh: 1,
-            pv_today_wh: 1,
-            pv_to_load_today_wh: 1,
-            pv_to_battery_today_wh: 1,
-            pv_to_grid_today_wh: 1,
-            battery_charged_today_wh: 1,
-            battery_discharged_today_wh: 1,
-        }
+    #[test]
+    fn update_inverter_data_test() {
+        let mut state: Option<InverterData> = None;
+        let e1 = InverterEvent {
+            ts: Utc.with_ymd_and_hms(2025, 12, 13, 14, 59, 25).unwrap(),
+            sn: "1234".to_string(),
+            pv_w: 200,
+            loads_w: 400,
+            grid_w: 100,
+            battery_w: 100,
+            battery_pct: 20.1,
+        };
+
+        let json_data = update_inverter_data(&mut state, e1.clone());
+        assert_eq!(
+            serde_json::to_string(&json_data).unwrap(),
+            serde_json::to_string(&ExpectedInverterDataJson {
+                id: "agg15:inverter:1234:2025-12-13T14:45Z".to_string(),
+                pv_ws: 0,
+                loads_ws: 0,
+                load_produced_ws: 0,
+                grid_import_ws: 0,
+                grid_export_ws: 0,
+                battery_charged_ws: 0,
+                battery_discharged_ws: 0,
+                battery_pct: 20.1,
+                complete: false
+            })
+            .unwrap()
+        );
+
+        let expected_inverter_data = Some(InverterData {
+            data_missing: true,
+            last_event: e1,
+            pv_ws: 0,
+            loads_ws: 0,
+            load_produced_ws: 0,
+            grid_import_ws: 0,
+            grid_export_ws: 0,
+            battery_charged_ws: 0,
+            battery_discharged_ws: 0,
+        });
+        assert_eq!(state, expected_inverter_data);
+
+        // Expect the current event updated within the same quarter hour
+        let e2 = InverterEvent {
+            ts: Utc.with_ymd_and_hms(2025, 12, 13, 14, 59, 45).unwrap(),
+            sn: "1234".to_string(),
+            pv_w: 200,
+            loads_w: 500,
+            grid_w: 200,
+            battery_w: 100,
+            battery_pct: 20.1,
+        };
+
+        let json_data = update_inverter_data(&mut state, e2.clone());
+        assert_eq!(
+            serde_json::to_string(&json_data).unwrap(),
+            serde_json::to_string(&ExpectedInverterDataJson {
+                id: "agg15:inverter:1234:2025-12-13T14:45Z".to_string(),
+                pv_ws: 4000,
+                loads_ws: 9000,
+                load_produced_ws: 0,
+                grid_import_ws: 3000,
+                grid_export_ws: 0,
+                battery_charged_ws: 0,
+                battery_discharged_ws: 2000,
+                battery_pct: 20.1,
+                complete: false
+            })
+            .unwrap()
+        );
+
+        let expected_inverter_data = Some(InverterData {
+            last_event: e2,
+            data_missing: true,
+            pv_ws: 4000,
+            loads_ws: 9000,
+            load_produced_ws: 0,
+            grid_import_ws: 3000,
+            grid_export_ws: 0,
+            battery_charged_ws: 0,
+            battery_discharged_ws: 2000,
+        });
+        assert_eq!(state, expected_inverter_data);
+
+        // New quarter hour: Expect updated json, but reset state
+        let e3 = InverterEvent {
+            ts: Utc.with_ymd_and_hms(2025, 12, 13, 15, 0, 5).unwrap(),
+            sn: "1234".to_string(),
+            pv_w: 0,
+            loads_w: -600,
+            grid_w: -500,
+            battery_w: -100,
+            battery_pct: 20.1,
+        };
+
+        let json_data = update_inverter_data(&mut state, e3.clone());
+        assert_eq!(
+            serde_json::to_string(&json_data).unwrap(),
+            serde_json::to_string(&ExpectedInverterDataJson {
+                id: "agg15:inverter:1234:2025-12-13T14:45Z".to_string(),
+                pv_ws: 6000,
+                loads_ws: 9000,
+                load_produced_ws: 1000,
+                grid_import_ws: 3000,
+                grid_export_ws: 3000,
+                battery_charged_ws: 0,
+                battery_discharged_ws: 2000,
+                battery_pct: 20.1,
+                complete: false
+            })
+            .unwrap()
+        );
+
+        let expected_inverter_data = Some(InverterData {
+            last_event: e3,
+            data_missing: false,
+            pv_ws: 0,
+            loads_ws: 0,
+            load_produced_ws: 0,
+            grid_import_ws: 0,
+            grid_export_ws: 0,
+            battery_charged_ws: 0,
+            battery_discharged_ws: 0,
+        });
+        assert_eq!(state, expected_inverter_data);
+
+        // Another event in the new quarter, JSON & state are equal
+        let e4 = InverterEvent {
+            ts: Utc.with_ymd_and_hms(2025, 12, 13, 15, 0, 25).unwrap(),
+            sn: "1234".to_string(),
+            pv_w: 0,
+            loads_w: -600,
+            grid_w: -500,
+            battery_w: -100,
+            battery_pct: 20.1,
+        };
+
+        let json_data = update_inverter_data(&mut state, e4.clone());
+        assert_eq!(
+            serde_json::to_string(&json_data).unwrap(),
+            serde_json::to_string(&ExpectedInverterDataJson {
+                id: "agg15:inverter:1234:2025-12-13T15:00Z".to_string(),
+                pv_ws: 0,
+                loads_ws: 0,
+                load_produced_ws: 12000,
+                grid_import_ws: 0,
+                grid_export_ws: 10000,
+                battery_charged_ws: 2000,
+                battery_discharged_ws: 0,
+                battery_pct: 20.1,
+                complete: false
+            })
+            .unwrap()
+        );
+
+        let expected_inverter_data = Some(InverterData {
+            last_event: e4,
+            data_missing: false,
+            pv_ws: 0,
+            loads_ws: 0,
+            load_produced_ws: 12000,
+            grid_import_ws: 0,
+            grid_export_ws: 10000,
+            battery_charged_ws: 2000,
+            battery_discharged_ws: 0,
+        });
+        assert_eq!(state, expected_inverter_data);
     }
 
     #[test]
-    fn update_ref_state_test() {
-        let mut state: Option<RefState> = None;
-        let e1 = event(Utc.with_ymd_and_hms(2025, 12, 13, 13, 0, 30).unwrap());
-
-        update_ref_state(&mut state, e1.clone());
-
-        let expected = Some(RefState {
-            current_event: e1.clone(),
-            ref_event: e1.clone(),
+    fn no_missing_data_and_full_15_minutes_is_complete() {
+        let mut state = Some(InverterData {
+            last_event: event_at(18, 59, 50),
+            data_missing: false,
+            pv_ws: 0,
+            loads_ws: 0,
+            load_produced_ws: 0,
+            grid_import_ws: 0,
+            grid_export_ws: 0,
+            battery_charged_ws: 0,
+            battery_discharged_ws: 0,
         });
-        assert_eq!(state, expected);
 
-        // Expect the current event updated within the same quarter hour
-        let e2 = event(Utc.with_ymd_and_hms(2025, 12, 13, 13, 14, 59).unwrap());
+        assert!(update_inverter_data(&mut state, event_at(19, 0, 2)).complete);
+    }
 
-        update_ref_state(&mut state, e2.clone());
-
-        let expected = Some(RefState {
-            current_event: e2.clone(),
-            ref_event: e1,
+    #[test]
+    fn no_missing_data_but_not_full_15_minutes_is_not_complete() {
+        let mut state = Some(InverterData {
+            last_event: event_at(18, 59, 50),
+            data_missing: false,
+            pv_ws: 0,
+            loads_ws: 0,
+            load_produced_ws: 0,
+            grid_import_ws: 0,
+            grid_export_ws: 0,
+            battery_charged_ws: 0,
+            battery_discharged_ws: 0,
         });
-        assert_eq!(state, expected);
 
-        // Expect everything updated when the quarter changes
-        let e3 = event(Utc.with_ymd_and_hms(2025, 12, 13, 13, 15, 0).unwrap());
+        let actual = update_inverter_data(&mut state, event_at(18, 59, 52)).complete;
+        assert!(!actual);
+    }
 
-        update_ref_state(&mut state, e3.clone());
-
-        let expected = Some(RefState {
-            current_event: e3,
-            ref_event: e2,
+    #[test]
+    fn full_15_minutes_but_missing_data_is_not_complete() {
+        let mut state = Some(InverterData {
+            last_event: event_at(18, 59, 50),
+            data_missing: true,
+            pv_ws: 0,
+            loads_ws: 0,
+            load_produced_ws: 0,
+            grid_import_ws: 0,
+            grid_export_ws: 0,
+            battery_charged_ws: 0,
+            battery_discharged_ws: 0,
         });
-        assert_eq!(state, expected);
+
+        let actual = update_inverter_data(&mut state, event_at(19, 0, 2)).complete;
+        assert!(!actual);
+    }
+
+    #[test]
+    fn no_data_missing_for_up_to_30_secs() {
+        let mut state = Some(InverterData {
+            last_event: event_at(19, 50, 50),
+            data_missing: false,
+            pv_ws: 0,
+            loads_ws: 0,
+            load_produced_ws: 0,
+            grid_import_ws: 0,
+            grid_export_ws: 0,
+            battery_charged_ws: 0,
+            battery_discharged_ws: 0,
+        });
+
+        update_inverter_data(&mut state, event_at(19, 51, 20));
+        assert!(!state.unwrap().data_missing);
+    }
+
+    #[test]
+    fn more_than_30_secs_between_data_missing() {
+        let mut state = Some(InverterData {
+            last_event: event_at(19, 50, 50),
+            data_missing: false,
+            pv_ws: 0,
+            loads_ws: 0,
+            load_produced_ws: 0,
+            grid_import_ws: 0,
+            grid_export_ws: 0,
+            battery_charged_ws: 0,
+            battery_discharged_ws: 0,
+        });
+
+        update_inverter_data(&mut state, event_at(19, 51, 21));
+        assert!(state.unwrap().data_missing);
+    }
+
+    #[derive(Serialize)]
+    struct ExpectedInverterDataJson {
+        #[serde(rename = "_id")]
+        id: String,
+        pv_ws: u32, // ws = watt seconds
+        loads_ws: u32,
+        load_produced_ws: u32, // If sources like plug in PV produce more than is consumed
+        grid_import_ws: u32,
+        grid_export_ws: u32,
+        battery_charged_ws: u32,
+        battery_discharged_ws: u32,
+        battery_pct: f64,
+        complete: bool,
+    }
+
+    fn event_at(hour: u32, min: u32, sec: u32) -> InverterEvent {
+        InverterEvent {
+            ts: Utc.with_ymd_and_hms(2026, 1, 2, hour, min, sec).unwrap(),
+            sn: "1234".to_string(),
+            pv_w: 0,
+            loads_w: 0,
+            grid_w: 0,
+            battery_w: 0,
+            battery_pct: 0.0,
+        }
     }
 }

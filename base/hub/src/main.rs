@@ -1,8 +1,8 @@
 mod aggregation;
 use aggregation::aggregate_inverters;
 use anyhow::{Context, Result};
-use std::{fs, path::Path};
 use serde::Deserialize;
+use std::{fs, path::Path};
 
 #[allow(clippy::print_stdout)]
 #[tokio::main]
