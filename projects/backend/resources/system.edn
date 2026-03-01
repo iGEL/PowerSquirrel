@@ -1,6 +1,7 @@
 {:backend.config/config {}
  :backend.couchdb/couchdb {:backend.config/config #ig/ref :backend.config/config}
- :backend.entsoe/entsoe {:backend.config/config #ig/ref :backend.config/config}
- :backend.entsoe.couchdb/entsoe-couchdb {:backend.entsoe/entsoe #ig/ref :backend.entsoe/entsoe
-                                         :backend.couchdb/couchdb #ig/ref :backend.couchdb/couchdb}
+ :backend.energy-charts/energy-charts {:backend.config/config #ig/ref :backend.config/config}
+ #_#_:backend.entsoe/entsoe {:backend.config/config #ig/ref :backend.config/config}
+ #_#_:backend.entsoe.couchdb/entsoe-couchdb {:backend.entsoe/entsoe #ig/ref :backend.entsoe/entsoe
+                                             :backend.couchdb/couchdb #ig/ref :backend.couchdb/couchdb}
  :backend.location/location {:backend.couchdb/couchdb #ig/ref :backend.couchdb/couchdb}}

@@ -2,8 +2,7 @@
   (:require
    [backend.couchdb :as couchdb]
    [backend.electricity-price :as ep]
-   [backend.entsoe :as entsoe]
-   [backend.entsoe.couchdb :as entsoe.couchdb]
+   [backend.energy-charts :as energy-charts]
    [backend.fees :as fees]
    [backend.location :as location]
    [backend.result :refer [branch-err branch-ok]]
@@ -41,8 +40,7 @@
 (defn -main [& _]
   (println (str "PowerSquirrel " version " 🐿️"))
   (let [{:keys [backend.couchdb/couchdb
-                backend.entsoe/entsoe
-                backend.entsoe.couchdb/entsoe-couchdb
+                backend.energy-charts/energy-charts
                 backend.location/location]} (system/init)]
     (-> (couchdb/setup<> couchdb)
         (branch-err (partial report-err+exit! "Failure to setup couchdb.")))
@@ -62,8 +60,7 @@
     (let [stromnetz-berlin (fees/parse "../backend/resources/stromnetz-berlin.json")
           fees (fees/merge stromnetz-berlin (fees/parse "../backend/resources/fees.json"))
           step (t/new-duration 15 :minutes)]
-      (-> (entsoe.couchdb/load-or-fetch-prices<> entsoe-couchdb (t/today) :de-lu)
-          (->> (entsoe/get-position<> entsoe 1))
+      (-> (energy-charts/fetch-prices<> energy-charts (t/today) :de-lu)
           (branch-ok (fn [prices]
                        (doseq [datetime (->> (iterate #(t/>> % step) (-> prices :schedule first :start))
                                              (take 96))]

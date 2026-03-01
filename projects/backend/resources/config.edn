@@ -1,6 +1,9 @@
 {:couchdb {:base-uri #profile {:default "http://localhost:5984"
                                :test "http://localhost:15984"}
            :basic-auth ["admin" "password"]}
+ :energy-charts {:base-uri "https://api.energy-charts.info/price"
+                 :bidding-zones {:de-lu {:bidding-zone-id "DE-LU"
+                                         :timezone "Europe/Berlin"}}}
  :entsoe {:base-uri "https://web-api.tp.entsoe.eu/api"
           :bidding-zones {:de-lu {:bidding-zone-id "10Y1001A1001A82H"
                                   :timezone "Europe/Berlin"}}
