@@ -1,10 +1,10 @@
-(ns backend.energy-charts-test
+(ns cloud.energy-charts-test
   (:require
-   [backend.energy-charts :as energy-charts]
-   [backend.result :refer [->Ok err? ok?]]
-   [backend.system :as system]
    [clj-http.fake :refer [with-fake-routes-in-isolation]]
    [clojure.test :refer [deftest is use-fixtures]]
+   [cloud.energy-charts :as energy-charts]
+   [cloud.result :refer [->Ok ok?]]
+   [cloud.system :as system]
    [dinero.core :refer [money-of]]
    [tick.core :as t]))
 
@@ -21,7 +21,7 @@
                   (constantly
                    {:status 200
                     :body (slurp "test/fixtures/energy_charts_1772319600_1772405100.json")})}
-                 (energy-charts/fetch-prices<> (:backend.energy-charts/energy-charts *system*)
+                 (energy-charts/fetch-prices<> (:cloud.energy-charts/energy-charts *system*)
                                                (t/date "2026-03-01")
                                                :de-lu))]
     (is (ok? result))
@@ -228,7 +228,7 @@
                   (constantly
                    {:status 200
                     :body (slurp "test/fixtures/energy_charts_1743289200_1743371100.json")})}
-                 (energy-charts/fetch-prices<> (:backend.energy-charts/energy-charts *system*)
+                 (energy-charts/fetch-prices<> (:cloud.energy-charts/energy-charts *system*)
                                                (t/date "2025-03-30")
                                                :de-lu))]
     (is (ok? result))
@@ -289,7 +289,7 @@
                   (constantly
                    {:status 200
                     :body (slurp "test/fixtures/energy_charts_1729980000_1730069100.json")})}
-                 (energy-charts/fetch-prices<> (:backend.energy-charts/energy-charts *system*)
+                 (energy-charts/fetch-prices<> (:cloud.energy-charts/energy-charts *system*)
                                                (t/date "2024-10-27")
                                                :de-lu))]
     (is (ok? result))

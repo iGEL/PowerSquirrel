@@ -1,10 +1,10 @@
-(ns backend.energy-charts
+(ns cloud.energy-charts
   (:require
-   [backend.result :refer [->Err ->Ok branch-ok try-result]]
-   [clj-http.client :as http]
-   [clojure.string :as str]
    [cheshire.core :as json]
    [cheshire.parse :as json.parse]
+   [clj-http.client :as http]
+   [clojure.string :as str]
+   [cloud.result :refer [->Err ->Ok branch-ok try-result]]
    [dinero.core :refer [money-of]]
    [dinero.math :as d.math]
    [integrant.core :as ig]
@@ -26,7 +26,7 @@
 
     (not (str/starts-with? (str license_info) "CC BY 4.0 (creativecommons.org/licenses/by/4.0)"))
     (->Err (ex-info "Licence info has changed" {:actual-license license_info
-                                                :expected  "CC BY 4.0 (creativecommons.org/licenses/by/4.0)"}))
+                                                :expected "CC BY 4.0 (creativecommons.org/licenses/by/4.0)"}))
 
     :else
     (->Ok (let [[currency unit] (str/split unit #" */ *")
@@ -68,7 +68,7 @@
                        (extract-info<> body)))))))
 
 (defmethod ig/init-key ::energy-charts
-  [_ {{{:keys [base-uri bidding-zones]} :energy-charts} :backend.config/config}]
+  [_ {{{:keys [base-uri bidding-zones]} :energy-charts} :cloud.config/config}]
   (map->EnergyCharts {:base-uri base-uri
                       :bidding-zones bidding-zones}))
 

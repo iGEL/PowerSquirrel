@@ -1,4 +1,4 @@
-(ns backend.config
+(ns cloud.config
   (:require
    [aero.core :refer [read-config]]
    [clojure.string :as str]

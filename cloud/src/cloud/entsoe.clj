@@ -1,9 +1,9 @@
-(ns backend.entsoe
+(ns cloud.entsoe
   (:require
-   [backend.result :refer [->Err ->Ok branch-ok try-result]]
    [clj-http.client :as http]
    [clojure.data.xml :as xml]
    [clojure.string :as str]
+   [cloud.result :refer [->Err ->Ok branch-ok try-result]]
    [dinero.core :refer [money-of]]
    [dinero.math :as d.math]
    [integrant.core :as ig]
@@ -134,7 +134,7 @@
                                         :present-positions (map :position price-series)}))))))))
 
 (defmethod ig/init-key ::entsoe
-  [_ {{{:keys [base-uri bidding-zones document-type token]} :entsoe} :backend.config/config}]
+  [_ {{{:keys [base-uri bidding-zones document-type token]} :entsoe} :cloud.config/config}]
   (map->Entsoe {:base-uri base-uri
                 :bidding-zones bidding-zones
                 :document-type document-type

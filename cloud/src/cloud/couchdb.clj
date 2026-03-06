@@ -1,10 +1,10 @@
-(ns backend.couchdb
+(ns cloud.couchdb
   (:require
-   [backend.config :as config]
-   [backend.result :refer [->Err ->Ok branch-ok try-result]]
    [cheshire.core :as json]
    [clj-http.client :as http]
    [clojure.string :as str]
+   [cloud.config :as config]
+   [cloud.result :refer [->Err ->Ok branch-ok try-result]]
    [integrant.core :as ig]))
 
 (defprotocol
@@ -57,6 +57,6 @@
       (->Err (ex-info "Not in test environment!" {})))))
 
 (defmethod ig/init-key ::couchdb
-  [_ {{{:keys [base-uri basic-auth]} :couchdb} :backend.config/config}]
+  [_ {{{:keys [base-uri basic-auth]} :couchdb} :cloud.config/config}]
   (map->CouchDB {:base-uri base-uri
                  :basic-auth basic-auth}))

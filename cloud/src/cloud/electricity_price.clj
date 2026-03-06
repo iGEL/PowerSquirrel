@@ -1,4 +1,4 @@
-(ns backend.electricity-price
+(ns cloud.electricity-price
   (:require
    [dinero.math :as d.math]
    [tick.core :as t]))

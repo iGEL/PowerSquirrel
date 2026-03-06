@@ -1,4 +1,4 @@
-(ns backend.weather
+(ns cloud.weather
   (:require [cheshire.core :as json]
             [clj-http.client :as http]))
 

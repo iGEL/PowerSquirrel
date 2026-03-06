@@ -1,7 +1,7 @@
-(ns backend.result-test
+(ns cloud.result-test
   (:require
-   [backend.result :as result]
-   [clojure.test :refer [deftest is]]))
+   [clojure.test :refer [deftest is]]
+   [cloud.result :as result]))
 
 (deftest ok?
   (is (result/ok? (result/->Ok 1)))

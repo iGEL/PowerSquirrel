@@ -1,26 +1,30 @@
-(ns backend.entsoe-test
+(ns cloud.entsoe-test
   (:require
-   [backend.entsoe :as entsoe]
-   [backend.result :refer [->Ok err? ok?]]
-   [backend.system :as system]
    [clj-http.fake :refer [with-fake-routes-in-isolation]]
    [clojure.test :refer [deftest is use-fixtures]]
+   [cloud.entsoe :as entsoe]
+   [cloud.result :refer [->Ok err? ok?]]
    [dinero.core :refer [money-of]]
    [tick.core :as t]))
 
 (def ^:dynamic *system* nil)
 
-(use-fixtures :once (fn [test-fn]
-                      (binding [*system* (system/init)]
-                        (test-fn)
-                        (system/halt *system*))))
+(use-fixtures :once
+  (fn [test-fn]
+    (binding [*system* {::entsoe/entsoe
+                        (entsoe/map->Entsoe {:base-uri "https://web-api.tp.entsoe.eu/api"
+                                             :bidding-zones {:de-lu {:bidding-zone-id "10Y1001A1001A82H"
+                                                                     :timezone "Europe/Berlin"}}
+                                             :document-type "A44"
+                                             :token "sec123"})}]
+      (test-fn))))
 
 (deftest default
   (let [result (with-fake-routes-in-isolation
                  {"https://web-api.tp.entsoe.eu/api?securityToken=sec123&documentType=A44&in_Domain=10Y1001A1001A82H&out_Domain=10Y1001A1001A82H&periodStart=202508202200&periodEnd=202508212200"
                   (constantly {:status 200
                                :body (slurp "test/fixtures/Energy_Prices_202508202200-202508212200.xml")})}
-                 (entsoe/fetch-prices<> (:backend.entsoe/entsoe *system*)
+                 (entsoe/fetch-prices<> (:cloud.entsoe/entsoe *system*)
                                         (t/date "2025-08-21")
                                         :de-lu))]
     (is (ok? result))
@@ -279,7 +283,7 @@
                  {"https://web-api.tp.entsoe.eu/api?securityToken=sec123&documentType=A44&in_Domain=10Y1001A1001A82H&out_Domain=10Y1001A1001A82H&periodStart=202503292300&periodEnd=202503302200"
                   (constantly {:status 200
                                :body (slurp "test/fixtures/Energy_Prices_begin_dst.xml")})}
-                 (entsoe/fetch-prices<> (:backend.entsoe/entsoe *system*)
+                 (entsoe/fetch-prices<> (:cloud.entsoe/entsoe *system*)
                                         (t/date "2025-03-30")
                                         :de-lu))]
     (is (ok? result))
@@ -344,7 +348,7 @@
                  {"https://web-api.tp.entsoe.eu/api?securityToken=sec123&documentType=A44&in_Domain=10Y1001A1001A82H&out_Domain=10Y1001A1001A82H&periodStart=202410262200&periodEnd=202410272300"
                   (constantly {:status 200
                                :body (slurp "test/fixtures/Energy_Prices_end_dst.xml")})}
-                 (entsoe/fetch-prices<> (:backend.entsoe/entsoe *system*)
+                 (entsoe/fetch-prices<> (:cloud.entsoe/entsoe *system*)
                                         (t/date "2024-10-27")
                                         :de-lu))]
     (is (ok? result))
@@ -413,7 +417,7 @@
                  {"https://web-api.tp.entsoe.eu/api?securityToken=sec123&documentType=A44&in_Domain=10Y1001A1001A82H&out_Domain=10Y1001A1001A82H&periodStart=202508202200&periodEnd=202508212200"
                   (constantly {:status 404
                                :body "Not found"})}
-                 (entsoe/fetch-prices<> (:backend.entsoe/entsoe *system*)
+                 (entsoe/fetch-prices<> (:cloud.entsoe/entsoe *system*)
                                         (t/date "2025-08-21")
                                         :de-lu))]
     (is (err? result))))

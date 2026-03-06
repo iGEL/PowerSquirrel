@@ -1,6 +1,6 @@
-(ns backend.system
+(ns cloud.system
   (:require
-   [backend.config]
+   [cloud.config]
    [integrant.core :as ig]))
 
 (defn init []

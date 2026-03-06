@@ -1,8 +1,8 @@
-(ns backend.location
+(ns cloud.location
   (:require
-   [backend.couchdb :as couchdb]
-   [backend.geocode :as geocode]
-   [backend.result :refer [->Ok branch-ok]]
+   [cloud.couchdb :as couchdb]
+   [cloud.geocode :as geocode]
+   [cloud.result :refer [->Ok branch-ok]]
    [integrant.core :as ig]))
 
 (defprotocol LocationProtocol
@@ -53,5 +53,5 @@
                                            :expected-responses [201]})))))))
 
 (defmethod ig/init-key ::location
-  [_ {couchdb :backend.couchdb/couchdb}]
+  [_ {couchdb :cloud.couchdb/couchdb}]
   (map->Location {:couchdb couchdb}))

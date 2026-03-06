@@ -1,4 +1,4 @@
-(ns backend.sun
+(ns cloud.sun
   (:import (org.shredzone.commons.suncalc SunPosition)))
 
 (defn position [{:keys [datetime]

@@ -1,7 +1,7 @@
-(ns backend.fees-test
+(ns cloud.fees-test
   (:require
-   [backend.fees :as fees]
    [clojure.test :refer [deftest is testing]]
+   [cloud.fees :as fees]
    [dinero.core :refer [money-of]]
    [tick.core :as t]))
 

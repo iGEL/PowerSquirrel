@@ -1,11 +1,11 @@
-(ns backend.entsoe.couchdb-test
+(ns cloud.entsoe.couchdb-test
   (:require
-   [backend.couchdb :as couchdb]
-   [backend.entsoe :as entsoe]
-   [backend.entsoe.couchdb :as entsoe.couchdb]
-   [backend.result :refer [->Ok branch-err]]
-   [backend.system :as system]
    [clojure.test :refer [deftest is use-fixtures]]
+   [cloud.couchdb :as couchdb]
+   [cloud.entsoe :as entsoe]
+   [cloud.entsoe.couchdb :as entsoe.couchdb]
+   [cloud.result :refer [->Ok branch-err]]
+   [cloud.system :as system]
    [dinero.core :refer [money-of]]
    [tick.core :as t]))
 
@@ -17,7 +17,7 @@
                         (system/halt *system*))))
 
 (use-fixtures :each (fn [test-fn]
-                      (-> (couchdb/setup-for-tests<> (:backend.couchdb/couchdb *system*))
+                      (-> (couchdb/setup-for-tests<> (:cloud.couchdb/couchdb *system*))
                           (branch-err (fn [e]
                                         (throw e))))
                       (test-fn)))
@@ -69,7 +69,7 @@
                    (->Ok response))
                  (get-position<> [_ _ _]))
         entsoe-couchdb (entsoe.couchdb/map->EntsoeCouchDb {:entsoe entsoe
-                                                           :couchdb (:backend.couchdb/couchdb *system*)})]
+                                                           :couchdb (:cloud.couchdb/couchdb *system*)})]
     (is (= 0 @!entsoe-calls))
 
     ;; data is not in couchdb -> fetch from entsoe

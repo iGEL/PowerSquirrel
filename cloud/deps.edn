@@ -13,7 +13,7 @@
         aero/aero {:mvn/version "1.1.6"}}
  :aliases
  {:run {:main-opts ["-e"
-                    "(do (try (require 'dev) (catch Throwable _ nil)) (require 'backend.main) (apply (resolve 'backend.main/-main) *command-line-args*))"]}
+                    "(do (try (require 'dev) (catch Throwable _ nil)) (require 'cloud.main) (apply (resolve 'cloud.main/-main) *command-line-args*))"]}
   :dev {:extra-paths ["dev"]}
   :repl {:main-opts ["-m" "nrepl.cmdline"
                      "-p" "56565"

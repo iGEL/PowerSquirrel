@@ -1,4 +1,4 @@
-(ns backend.geocode
+(ns cloud.geocode
   (:require [cheshire.core :as json]
             [clj-http.client :as http]))
 

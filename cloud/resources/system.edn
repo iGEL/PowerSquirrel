@@ -1,0 +1,7 @@
+{:cloud.config/config {}
+ :cloud.couchdb/couchdb {:cloud.config/config #ig/ref :cloud.config/config}
+ :cloud.energy-charts/energy-charts {:cloud.config/config #ig/ref :cloud.config/config}
+ #_#_:cloud.entsoe/entsoe {:cloud.config/config #ig/ref :cloud.config/config}
+ #_#_:cloud.entsoe.couchdb/entsoe-couchdb {:cloud.entsoe/entsoe #ig/ref :cloud.entsoe/entsoe
+                                           :cloud.couchdb/couchdb #ig/ref :cloud.couchdb/couchdb}
+ :cloud.location/location {:cloud.couchdb/couchdb #ig/ref :cloud.couchdb/couchdb}}

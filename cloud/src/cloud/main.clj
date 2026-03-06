@@ -1,14 +1,14 @@
-(ns backend.main
+(ns cloud.main
   (:require
-   [backend.couchdb :as couchdb]
-   [backend.electricity-price :as ep]
-   [backend.energy-charts :as energy-charts]
-   [backend.fees :as fees]
-   [backend.location :as location]
-   [backend.result :refer [branch-err branch-ok]]
-   [backend.sun :as sun]
-   [backend.system :as system]
-   [backend.weather :as weather]
+   [cloud.couchdb :as couchdb]
+   [cloud.electricity-price :as ep]
+   [cloud.energy-charts :as energy-charts]
+   [cloud.fees :as fees]
+   [cloud.location :as location]
+   [cloud.result :refer [branch-err branch-ok]]
+   [cloud.sun :as sun]
+   [cloud.system :as system]
+   [cloud.weather :as weather]
    [dinero.core :as dinero]
    [tick.core :as t]))
 
@@ -39,9 +39,9 @@
 
 (defn -main [& _]
   (println (str "PowerSquirrel " version " 🐿️"))
-  (let [{:keys [backend.couchdb/couchdb
-                backend.energy-charts/energy-charts
-                backend.location/location]} (system/init)]
+  (let [{:keys [cloud.couchdb/couchdb
+                cloud.energy-charts/energy-charts
+                cloud.location/location]} (system/init)]
     (-> (couchdb/setup<> couchdb)
         (branch-err (partial report-err+exit! "Failure to setup couchdb.")))
     (let [zip "12207"
@@ -57,8 +57,8 @@
             (println (format "%s Temperature: %5.2f°, Clouds: %3d%% - Solar Altitude: %6.2f° Azimuth: %6.2f°"
                              time temp (int clouds) altitude azimuth))))))
 
-    (let [stromnetz-berlin (fees/parse "../backend/resources/stromnetz-berlin.json")
-          fees (fees/merge stromnetz-berlin (fees/parse "../backend/resources/fees.json"))
+    (let [stromnetz-berlin (fees/parse "../cloud/resources/stromnetz-berlin.json")
+          fees (fees/merge stromnetz-berlin (fees/parse "../cloud/resources/fees.json"))
           step (t/new-duration 15 :minutes)]
       (-> (energy-charts/fetch-prices<> energy-charts (t/today) :de-lu)
           (branch-ok (fn [prices]

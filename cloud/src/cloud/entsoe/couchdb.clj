@@ -1,8 +1,8 @@
-(ns backend.entsoe.couchdb
+(ns cloud.entsoe.couchdb
   (:require
-   [backend.couchdb :as couchdb]
-   [backend.entsoe :as entsoe]
-   [backend.result :refer [->Ok branch-err branch-ok]]
+   [cloud.couchdb :as couchdb]
+   [cloud.entsoe :as entsoe]
+   [cloud.result :refer [->Ok branch-err branch-ok]]
    [dinero.core :as dinero]
    [integrant.core :as ig]
    [tick.core :as t])
@@ -61,7 +61,7 @@
                                                           (->Ok prices)))))))))))))
 
 (defmethod ig/init-key ::entsoe-couchdb
-  [_ {entsoe :backend.entsoe/entsoe
-      couchdb :backend.couchdb/couchdb}]
+  [_ {entsoe :cloud.entsoe/entsoe
+      couchdb :cloud.couchdb/couchdb}]
   (map->EntsoeCouchDb {:couchdb couchdb
                        :entsoe entsoe}))

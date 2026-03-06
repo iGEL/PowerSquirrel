@@ -1,4 +1,4 @@
-(ns backend.result)
+(ns cloud.result)
 
 (defrecord Ok [val])
 (defrecord Err [err])

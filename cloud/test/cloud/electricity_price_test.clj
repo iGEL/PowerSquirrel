@@ -1,7 +1,7 @@
-(ns backend.electricity-price-test
+(ns cloud.electricity-price-test
   (:require
-   [backend.electricity-price :as electricity-price]
    [clojure.test :refer [deftest is testing]]
+   [cloud.electricity-price :as electricity-price]
    [dinero.core :refer [money-of]]
    [tick.core :as t]))
 

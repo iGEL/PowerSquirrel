@@ -1,4 +1,4 @@
-(ns backend.fees
+(ns cloud.fees
   (:refer-clojure :exclude [merge])
   (:require
    [cheshire.core :as json]
