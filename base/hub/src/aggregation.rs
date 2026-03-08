@@ -4,9 +4,14 @@ use chrono::{DateTime, Timelike, Utc};
 use rumqttc::{AsyncClient, Event, Incoming, MqttOptions, QoS};
 use serde::Deserialize;
 use serde::Serialize;
+use std::future::Future;
 use std::time::Duration;
 
-pub async fn aggregate_inverters(mqtt_config: &MqttConfig) -> Result<()> {
+pub async fn aggregate_inverters<F, Fut>(mqtt_config: &MqttConfig, commit_fn: F) -> Result<()>
+where
+    F: Fn(InverterDataJson) -> Fut,
+    Fut: Future<Output = Result<()>>,
+{
     let mut mqttoptions =
         MqttOptions::new("rumqtt-sync", mqtt_config.host.as_str(), mqtt_config.port);
     mqttoptions.set_keep_alive(Duration::from_secs(5));
@@ -28,7 +33,9 @@ pub async fn aggregate_inverters(mqtt_config: &MqttConfig) -> Result<()> {
                 match serde_json::from_slice::<InverterEvent>(&p.payload) {
                     Ok(ev) => {
                         let json_data = update_inverter_data(&mut state, ev.clone());
-                        println!("{}", serde_json::to_string(&json_data).unwrap());
+                        if let Err(e) = commit_fn(json_data).await {
+                            eprintln!("err committing data: {e:?}");
+                        }
                     }
                     Err(e) => eprintln!("err parsing event: {e:?}"),
                 }
@@ -66,9 +73,9 @@ struct InverterData {
 }
 
 #[derive(Serialize)]
-struct InverterDataJson {
+pub struct InverterDataJson {
     #[serde(rename = "_id")]
-    id: String,
+    pub id: String,
     #[serde(rename = "_rev", skip_serializing_if = "Option::is_none")]
     rev: Option<String>,
     #[serde(flatten)]
