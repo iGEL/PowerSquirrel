@@ -1,0 +1,22 @@
+{
+  "name": "power-squirrel",
+  "scripts": {
+    "dev": "shadow-cljs -A:dev watch app",
+    "release": "shadow-cljs -A:dev release app",
+    "fmt": "clojure -M:nsorg-fix src test && clojure -M:cljfmt-fix src test public deps.edn shadow-cljs.edn",
+    "lint": "clojure -M:lint src test",
+    "test": "shadow-cljs compile unittest"
+  },
+  "devDependencies": {
+    "onchange": "^7.1.0",
+    "react-refresh": "^0.18.0",
+    "shadow-cljs": "^3.3.6"
+  },
+  "dependencies": {
+    "primeicons": "^7.0.0",
+    "primereact": "^10.9.7",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "packageManager": "yarn@4.13.0"
+}

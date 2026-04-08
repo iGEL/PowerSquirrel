@@ -1,0 +1,13 @@
+.cpcache
+.shadow-cljs
+node_modules
+public/js
+.clj-kondo/.cache
+.lsp
+out
+
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/patches
+!.yarn/sdks

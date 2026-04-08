@@ -1,0 +1,10 @@
+{:deps true
+ :dev-http {4321 "public"}
+ :builds {:app {:target :browser
+                :modules {:main {:entries [power-squirrel.main]
+                                 :init-fn power-squirrel.main/init}}
+                :devtools {:preloads [uix.preload devtools.preload]}}
+          :unittest {:target    :node-test
+                     :output-to "out/node-tests.js"
+                     :ns-regexp "-test$"
+                     :autorun   true}}}

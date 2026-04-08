@@ -1,0 +1,8 @@
+@import "/vendor/primereact/theme.css";
+@import "/vendor/primereact/primereact.min.css";
+@import "/vendor/primeicons/primeicons.css";
+
+.logo {
+  padding-right: 8px;
+  height: 40px;
+}
