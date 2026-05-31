@@ -1,6 +1,6 @@
 {
-  "couchdb": {
-    "base_uri": "http://admin:password@localhost:5984"
+  "database": {
+    "path": "/app/data/hub.db"
   },
   "mqtt": {
     "host": "localhost",

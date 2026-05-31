@@ -1,8 +1,8 @@
 mod aggregation;
-mod couchdb;
+mod db;
 use aggregation::aggregate_inverters;
 use anyhow::{Context, Result};
-use couchdb::CouchDBConfig;
+use db::DatabaseConfig;
 use serde::Deserialize;
 use std::{fs, path::Path};
 
@@ -12,14 +12,10 @@ async fn main() -> Result<()> {
     println!("PowerSquirrel base hub {} 🐿️", env!("CARGO_PKG_VERSION"));
 
     let config = load_config(Path::new("config.json"))?;
-    let couchdb = couchdb::init(config.couchdb);
-    let commit = |data: aggregation::InverterDataJson| {
-        let couchdb = &couchdb;
-        async move {
-            couchdb
-                .write("energy".to_string(), data.id.clone(), &data)
-                .await
-        }
+    let database = db::init(&config.database).await?;
+    let commit = |data: aggregation::InverterAgg15| {
+        let database = database.clone();
+        async move { db::upsert_inverter_agg15(&database, &data).await }
     };
 
     aggregate_inverters(&config.mqtt, commit).await
@@ -27,7 +23,7 @@ async fn main() -> Result<()> {
 
 #[derive(Deserialize, Debug)]
 struct Config {
-    couchdb: CouchDBConfig,
+    database: DatabaseConfig,
     mqtt: MqttConfig,
 }
 
