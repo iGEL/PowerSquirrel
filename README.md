@@ -1,3 +1,6 @@
+> [!WARNING]
+> PowerSquirrel is under active development and is currently still incomplete.
+
 ## PowerSquirrel
 
 ![](./docs/sparky.svg)

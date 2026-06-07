@@ -23,7 +23,7 @@ COPY src ./src
 # Build release binary
 # On this image/arch, the host triple is aarch64-unknown-linux-musl
 # which produces a (fully) static musl binary by default.
-RUN cargo build --release
+RUN touch src/main.rs && cargo build --release
 
 #########################
 # Final runtime image   #
