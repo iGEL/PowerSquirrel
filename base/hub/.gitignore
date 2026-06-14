@@ -1,4 +1,6 @@
 target
+.cpcache
+.nrepl-port
 config.json
 *.db
 *.db-wal

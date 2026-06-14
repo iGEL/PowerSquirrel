@@ -50,10 +50,38 @@ Telemetry tables should be indexed for common time range filters. For example,
 15-minute measurements should have an index or primary key that starts with the
 series identity, such as device and metric, followed by the timestamp column.
 
+## Implementation
+
+The hub is a Clojure application (`src/hub/`), wired together with Integrant:
+
+* `hub.mqtt` — Eclipse Paho v5 client, subscribes to `posq/#`
+* `hub.aggregation` — pure 15-minute watt-second fold over inverter events
+* `hub.db` — SQLite via next.jdbc, queries in HugSQL (`resources/sql/`),
+  schema migrations via Migratus (`resources/migrations/`)
+* `hub.system` / `hub.main` — component graph and entry point
+
+Config is loaded from `resources/config.edn` via aero (env overrides:
+`HUB_DB_PATH`, `MQTT_HOST`, `MQTT_PORT`, `MQTT_USER`, `MQTT_PASSWORD`).
+
+## Development
+
+```bash
+clojure -M:test          # run unit tests (kaocha)
+clojure -M:run           # run the hub locally
+clojure -M:cljfmt-fix    # format
+clojure -T:build uber    # build target/hub.jar
+```
+
 ## Build instructions
 
-docker buildx build --platform linux/arm64/v8 -t posq/hub:arm64 --load .
-docker save posq/hub -o hub.ta
+The container is built from `Dockerfile.clojure` (a multi-stage build that
+produces an uberjar and runs it on a JRE):
+
+```bash
+docker buildx build --platform linux/arm64/v8 -f Dockerfile.clojure \
+  -t posq/hub:arm64 --load .
+docker save posq/hub -o hub.tar
 scp ...
 ssh ...
 docker load -i hub.tar
+```

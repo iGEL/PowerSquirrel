@@ -1,0 +1,35 @@
+# syntax=docker/dockerfile:1.6
+# Clojure rewrite of the base hub. Build for the Raspberry Pi (ARM64):
+#   docker buildx build --platform linux/arm64/v8 -f Dockerfile.clojure \
+#     -t posq/hub:arm64 --load .
+
+############################
+# Builder: deps + uberjar  #
+############################
+FROM --platform=linux/arm64/v8 clojure:temurin-21-tools-deps-alpine AS builder
+
+WORKDIR /app
+
+# Cache dependency downloads on their own layer.
+COPY deps.edn build.clj ./
+RUN clojure -P -T:build uber
+
+# Build the uberjar from real sources.
+COPY src ./src
+COPY resources ./resources
+RUN clojure -T:build uber
+
+#########################
+# Final runtime image   #
+#########################
+FROM --platform=linux/arm64/v8 eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/target/hub.jar /app/hub.jar
+
+# Trim the JVM footprint on the Pi; tune to the box's RAM as needed.
+ENV JAVA_OPTS="-XX:+UseSerialGC -XX:MaxRAMPercentage=50"
+ENV HUB_DB_PATH=/app/data/hub.db
+
+CMD ["sh", "-c", "java $JAVA_OPTS -jar /app/hub.jar"]
