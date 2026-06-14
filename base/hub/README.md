@@ -74,12 +74,11 @@ clojure -T:build uber    # build target/hub.jar
 
 ## Build instructions
 
-The container is built from `Dockerfile.clojure` (a multi-stage build that
-produces an uberjar and runs it on a JRE):
+The container is built from `Dockerfile` (a multi-stage build that produces an
+uberjar and runs it on a JRE):
 
 ```bash
-docker buildx build --platform linux/arm64/v8 -f Dockerfile.clojure \
-  -t posq/hub:arm64 --load .
+docker buildx build --platform linux/arm64/v8 -t posq/hub:arm64 --load .
 docker save posq/hub -o hub.tar
 scp ...
 ssh ...
