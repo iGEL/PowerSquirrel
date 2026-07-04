@@ -1,4 +1,8 @@
-create table inverter_agg15 (
+-- 'if not exists' everywhere: databases created by the old Rust hub (sqlx)
+-- already contain this exact schema, but sqlx tracked applied migrations in
+-- _sqlx_migrations, which Migratus doesn't read. This lets Migratus adopt
+-- such a database instead of failing on the existing table.
+create table if not exists inverter_agg15 (
     inverter_sn text not null,
     started_at_s integer not null,
 
@@ -18,8 +22,8 @@ create table inverter_agg15 (
     primary key (inverter_sn, started_at_s)
 ) strict;
 --;;
-create index inverter_agg15_started_at_idx
+create index if not exists inverter_agg15_started_at_idx
 on inverter_agg15 (started_at_s);
 --;;
-create index inverter_agg15_complete_started_at_idx
+create index if not exists inverter_agg15_complete_started_at_idx
 on inverter_agg15 (complete, started_at_s);
