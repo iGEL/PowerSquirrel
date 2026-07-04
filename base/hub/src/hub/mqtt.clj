@@ -24,6 +24,10 @@
     (when (and user password)
       (.setUserName opts user)
       (.setPassword opts (.getBytes ^String password StandardCharsets/UTF_8)))
+    ;; host/user default to localhost/anonymous when the MQTT_* env vars are
+    ;; unset, so log the resolved target before a connect failure can throw.
+    (t/log! :info (str "connecting to " uri
+                       (if (and user password) (str " as " user) " anonymously")))
     (.setCallback client
                   (reify MqttCallback
                     (messageArrived [_ topic message]

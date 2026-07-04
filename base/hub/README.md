@@ -63,6 +63,31 @@ The hub is a Clojure application (`src/hub/`), wired together with Integrant:
 Config is loaded from `resources/config.edn` via aero (env overrides:
 `HUB_DB_PATH`, `MQTT_HOST`, `MQTT_PORT`, `MQTT_USER`, `MQTT_PASSWORD`).
 
+## Upgrading from the Rust hub
+
+The Rust hub read a `config.json` mounted at `/app/config.json`; the Clojure
+hub ignores that file and is configured through the environment variables
+above. Without them it falls back to an anonymous connection to
+`localhost:1883`, which is never right inside a container. Update the deploy
+compose file to pass the config, e.g.:
+
+```yaml
+  hub:
+    image: posq/hub:arm64
+    restart: unless-stopped
+    environment:
+      - MQTT_HOST=mqtt
+    env_file:
+      - /opt/posq/etc/hub.env   # MQTT_USER=... / MQTT_PASSWORD=...
+    volumes:
+      - hub_data:/app/data
+    depends_on:
+      - mqtt
+```
+
+The database file needs no manual step: the migration adopts a hub.db created
+by the Rust hub (its schema is identical; only the migration ledger differs).
+
 ## Development
 
 ```bash
