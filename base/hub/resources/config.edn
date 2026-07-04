@@ -1,0 +1,5 @@
+{:database {:path #or [#env HUB_DB_PATH "hub.db"]}
+ :mqtt {:host     #or [#env MQTT_HOST "localhost"]
+        :port     #long #or [#env MQTT_PORT "1883"]
+        :user     #env MQTT_USER
+        :password #env MQTT_PASSWORD}}

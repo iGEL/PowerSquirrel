@@ -50,10 +50,62 @@ Telemetry tables should be indexed for common time range filters. For example,
 15-minute measurements should have an index or primary key that starts with the
 series identity, such as device and metric, followed by the timestamp column.
 
+## Implementation
+
+The hub is a Clojure application (`src/hub/`), wired together with Integrant:
+
+* `hub.mqtt` — Eclipse Paho v5 client, subscribes to `posq/#`
+* `hub.aggregation` — pure 15-minute watt-second fold over inverter events
+* `hub.db` — SQLite via next.jdbc, queries in HugSQL (`resources/sql/`),
+  schema migrations via Migratus (`resources/migrations/`)
+* `hub.system` / `hub.main` — component graph and entry point
+
+Config is loaded from `resources/config.edn` via aero (env overrides:
+`HUB_DB_PATH`, `MQTT_HOST`, `MQTT_PORT`, `MQTT_USER`, `MQTT_PASSWORD`).
+
+## Upgrading from the Rust hub
+
+The Rust hub read a `config.json` mounted at `/app/config.json`; the Clojure
+hub ignores that file and is configured through the environment variables
+above. Without them it falls back to an anonymous connection to
+`localhost:1883`, which is never right inside a container. Update the deploy
+compose file to pass the config, e.g.:
+
+```yaml
+  hub:
+    image: posq/hub:arm64
+    restart: unless-stopped
+    environment:
+      - MQTT_HOST=mqtt
+    env_file:
+      - /opt/posq/etc/hub.env   # MQTT_USER=... / MQTT_PASSWORD=...
+    volumes:
+      - hub_data:/app/data
+    depends_on:
+      - mqtt
+```
+
+The database file needs no manual step: the migration adopts a hub.db created
+by the Rust hub (its schema is identical; only the migration ledger differs).
+
+## Development
+
+```bash
+clojure -M:test          # run unit tests (kaocha)
+clojure -M:run           # run the hub locally
+clojure -M:cljfmt-fix    # format
+clojure -T:build uber    # build target/hub.jar
+```
+
 ## Build instructions
 
+The container is built from `Dockerfile` (a multi-stage build that produces an
+uberjar and runs it on a JRE):
+
+```bash
 docker buildx build --platform linux/arm64/v8 -t posq/hub:arm64 --load .
-docker save posq/hub -o hub.ta
+docker save posq/hub -o hub.tar
 scp ...
 ssh ...
 docker load -i hub.tar
+```

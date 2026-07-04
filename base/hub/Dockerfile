@@ -1,42 +1,36 @@
 # syntax=docker/dockerfile:1.6
+# Clojure base hub. Build for the Raspberry Pi (ARM64):
+#   docker buildx build --platform linux/arm64/v8 -t posq/hub:arm64 --load .
 
-###########################
-# Builder (ARM64, Alpine) #
-###########################
-FROM --platform=linux/arm64/v8 rust:1-alpine3.20 AS builder
-
-# Install build tools
-RUN apk add --no-cache build-base
+############################
+# Builder: deps + uberjar  #
+############################
+FROM --platform=linux/arm64/v8 clojure:temurin-21-tools-deps-alpine AS builder
 
 WORKDIR /app
 
-# Pre-build step to cache dependencies
-COPY Cargo.toml Cargo.lock ./
-RUN mkdir src && echo 'fn main() {}' > src/main.rs \
-    && cargo build --release \
-    && rm -rf src
+# Cache dependency downloads on their own layer. `-P -T:build` only prepares
+# the build tool's deps; the plain `-P` fetches the project deps that
+# b/create-basis would otherwise re-download after every source change.
+COPY deps.edn build.clj ./
+RUN clojure -P && clojure -P -T:build uber
 
-# Now copy real sources
-COPY migrations ./migrations
+# Build the uberjar from real sources.
 COPY src ./src
-
-# Build release binary
-# On this image/arch, the host triple is aarch64-unknown-linux-musl
-# which produces a (fully) static musl binary by default.
-RUN touch src/main.rs && cargo build --release
+COPY resources ./resources
+RUN clojure -T:build uber
 
 #########################
 # Final runtime image   #
 #########################
-FROM --platform=linux/arm64/v8 alpine:3.20
+FROM --platform=linux/arm64/v8 eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-# Copy the static binary
-COPY --from=builder /app/target/release/hub /usr/local/bin/hub
+COPY --from=builder /app/target/hub.jar /app/hub.jar
 
-# Optional: app user instead of root
-# RUN adduser -D appuser
-# USER appuser
+# Trim the JVM footprint on the Pi; tune to the box's RAM as needed.
+ENV JAVA_OPTS="-XX:+UseSerialGC -XX:MaxRAMPercentage=50"
+ENV HUB_DB_PATH=/app/data/hub.db
 
-CMD ["hub"]
+CMD ["sh", "-c", "java $JAVA_OPTS -jar /app/hub.jar"]
