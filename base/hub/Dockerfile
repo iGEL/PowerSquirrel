@@ -9,9 +9,11 @@ FROM --platform=linux/arm64/v8 clojure:temurin-21-tools-deps-alpine AS builder
 
 WORKDIR /app
 
-# Cache dependency downloads on their own layer.
+# Cache dependency downloads on their own layer. `-P -T:build` only prepares
+# the build tool's deps; the plain `-P` fetches the project deps that
+# b/create-basis would otherwise re-download after every source change.
 COPY deps.edn build.clj ./
-RUN clojure -P -T:build uber
+RUN clojure -P && clojure -P -T:build uber
 
 # Build the uberjar from real sources.
 COPY src ./src
